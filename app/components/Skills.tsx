@@ -122,8 +122,8 @@ export default function Skills() {
 
         {/* Marquee */}
         <div className="relative mb-16">
-          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-linear-to-l from-bg to-transparent z-10 pointer-events-none" />
           <div className="overflow-hidden">
             <div className="flex marquee-track gap-4 whitespace-nowrap py-3">
               {[...marquee, ...marquee].map((m, i) => (

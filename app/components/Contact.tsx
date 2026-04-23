@@ -94,7 +94,7 @@ export default function Contact() {
                 </div>
               </div>
               {/* Floating orb */}
-              <div className="absolute -right-16 -bottom-16 h-72 w-72 rounded-full bg-gradient-to-br from-accent to-accent-3 opacity-20 blur-3xl float-soft" />
+              <div className="absolute -right-16 -bottom-16 h-72 w-72 rounded-full bg-linear-to-br from-accent to-accent-3 opacity-20 blur-3xl float-soft" />
             </a>
           </Reveal>
 

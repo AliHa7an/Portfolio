@@ -184,7 +184,7 @@ function ProjectCard({ p, i }: { p: Project; i: number }) {
     >
       {/* Tinted gradient backdrop */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${p.accent} opacity-40 group-hover:opacity-70 transition-opacity duration-500`}
+        className={`absolute inset-0 bg-linear-to-br ${p.accent} opacity-40 group-hover:opacity-70 transition-opacity duration-500`}
       />
       {/* Mesh dots */}
       <div

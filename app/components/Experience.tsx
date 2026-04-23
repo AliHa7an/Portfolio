@@ -113,7 +113,7 @@ export default function Experience() {
           <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-line-strong/60" />
           <motion.div
             style={{ height: lineH }}
-            className="absolute left-4 md:left-1/2 top-0 w-px bg-gradient-to-b from-accent via-accent-2 to-accent-3"
+            className="absolute left-4 md:left-1/2 top-0 w-px bg-linear-to-b from-accent via-accent-2 to-accent-3"
           />
 
           <ul className="space-y-12 md:space-y-20">

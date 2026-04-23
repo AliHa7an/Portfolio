@@ -21,7 +21,7 @@ export default function Hero() {
     <section
       id="top"
       ref={ref}
-      className="relative min-h-[100svh] flex items-center pt-32 pb-20"
+      className="relative min-h-svh flex items-center pt-32 pb-20"
     >
       <div className="container-x px-5 w-full">
         {/* Status pill */}
@@ -135,9 +135,9 @@ export default function Hero() {
             className="lg:col-span-4"
           >
             <div className="relative mx-auto max-w-sm">
-              <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-accent/30 via-accent-2/15 to-accent-3/30 blur-2xl opacity-70" />
+              <div className="absolute -inset-4 rounded-4xl bg-linear-to-br from-accent/30 via-accent-2/15 to-accent-3/30 blur-2xl opacity-70" />
               <div className="relative rounded-[1.75rem] border border-line-strong bg-surface/70 backdrop-blur-xl p-3 overflow-hidden">
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-bg-soft">
+                <div className="relative aspect-4/5 rounded-2xl overflow-hidden bg-bg-soft">
                   <Image
                     src="/profile.png"
                     alt="Ali Hassan"
@@ -146,7 +146,7 @@ export default function Hero() {
                     className="object-cover"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
                     <div>
                       <div className="text-[10px] uppercase tracking-[0.2em] opacity-80">
