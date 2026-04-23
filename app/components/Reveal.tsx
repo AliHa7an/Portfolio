@@ -56,7 +56,7 @@ export function RevealText({
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const words = text.split(" ");
-  const Tag = as as keyof React.JSX.IntrinsicElements;
+  const Tag = as as unknown as React.FC<{ className?: string; children: React.ReactNode }>;
   return (
     <Tag className={className}>
       <span ref={ref} className="inline">
