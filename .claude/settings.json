@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/mac/Desktop/Ali-Hassan-Portfolio log --oneline -5)",
+      "Bash(git -C /Users/mac/Desktop/Ali-Hassan-Portfolio show 7e41495 --stat)"
+    ]
+  }
+}
