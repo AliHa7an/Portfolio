@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f6f6f4;
+  --bg-soft: #ececea;
+  --surface: #ffffff;
+  --fg: #0b0b0d;
+  --fg-soft: #45454d;
+  --muted: #8a8a93;
+  --line: rgba(11, 11, 13, 0.08);
+  --line-strong: rgba(11, 11, 13, 0.16);
+  --accent: #ff5b22;
+  --accent-2: #ffb629;
+  --accent-3: #6e56ff;
+}
+
+.dark {
+  --bg: #07070a;
+  --bg-soft: #0e0e14;
+  --surface: #101018;
+  --fg: #f4f4f7;
+  --fg-soft: #c8c8d2;
+  --muted: #6e6e7a;
+  --line: rgba(244, 244, 247, 0.08);
+  --line-strong: rgba(244, 244, 247, 0.18);
+  --accent: #ff7a45;
+  --accent-2: #ffd166;
+  --accent-3: #8a73ff;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-soft: var(--fg-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv11";
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  cursor: none;
+}
+
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Grain noise overlay */
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Animated gradient text */
+.gradient-text {
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 40%, var(--accent-3) 80%, var(--accent) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 8s linear infinite;
+}
+
+@keyframes gradient-shift {
+  to {
+    background-position: 250% 0;
+  }
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+.marquee-track-rev {
+  animation: marquee 50s linear infinite reverse;
+}
+
+/* Spotlight border on cards */
+.card-spotlight {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    400px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 122, 69, 0.65),
+    transparent 40%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.card-spotlight:hover::before {
+  opacity: 1;
+}
+
+/* Reveal up util */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+.float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+/* Shiny button */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+.btn-shine:hover::after {
+  left: 130%;
+}
+
+/* Marker text underline */
+.under-mark {
+  background-image: linear-gradient(transparent 60%, color-mix(in oklab, var(--accent) 35%, transparent) 60%);
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.6s ease;
+}
+.under-mark:hover {
+  background-size: 100% 100%;
+}
+
+/* Section paddings */
+.section {
+  position: relative;
+  padding: 7rem 1.25rem;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .section { padding: 10rem 2rem; }
+}
+
+.container-x {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Hide cursor on inputs/buttons override (we add custom hover) */
+a, button, [data-cursor="hover"] {
+  cursor: none;
+}
+
+@media (pointer: coarse) {
+  a, button, [data-cursor="hover"] { cursor: pointer; }
+}
