@@ -28,8 +28,8 @@ const channels = [
   {
     Icon: LinkedinIcon,
     label: "LinkedIn",
-    value: "alihexan",
-    href: "https://www.linkedin.com/in/alihexan/",
+    value: "in/ali-ha7an",
+    href: "https://www.linkedin.com/in/ali-ha7an/",
   },
 ];
 

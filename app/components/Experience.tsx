@@ -129,7 +129,14 @@ export default function Experience() {
                     transition={{ duration: 0.5 }}
                     className="absolute left-4 md:left-1/2 top-2 -translate-x-1/2 z-10"
                   >
-                    <span className="block h-4 w-4 rounded-full bg-bg border-2 border-accent shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_18%,transparent)]" />
+                    {i === 0 ? (
+                      <span className="relative flex h-4 w-4">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                        <span className="relative inline-flex h-4 w-4 rounded-full bg-bg border-2 border-emerald-500 shadow-[0_0_0_4px_color-mix(in_oklab,#22c55e_18%,transparent)]" />
+                      </span>
+                    ) : (
+                      <span className="block h-4 w-4 rounded-full bg-bg border-2 border-accent shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_18%,transparent)]" />
+                    )}
                   </motion.div>
 
                   <div
@@ -170,9 +177,17 @@ export default function Experience() {
                         <div className="md:hidden font-mono text-xs text-accent mb-2 tracking-wider">
                           {job.period} · {job.location}
                         </div>
-                        <h3 className="font-display text-xl md:text-2xl font-semibold">
-                          {job.company}
-                        </h3>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h3 className="font-display text-xl md:text-2xl font-semibold">
+                            {job.company}
+                          </h3>
+                          {i === 0 && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium tracking-wide text-emerald-500">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Current
+                            </span>
+                          )}
+                        </div>
                         <div className="mt-1 text-sm text-fg-soft">
                           {job.role}
                         </div>

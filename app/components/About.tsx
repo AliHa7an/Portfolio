@@ -9,9 +9,11 @@ import {
   Cloud,
   Code2,
   Database,
+  GraduationCap,
   Rocket,
   ShieldCheck,
 } from "lucide-react";
+import DeveloperCard from "./DeveloperCard";
 
 function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -104,32 +106,44 @@ export default function About() {
                 </div>
                 <div>
                   <div className="font-display text-5xl font-semibold text-accent-2">
-                    <Counter to={25} suffix="%" />
+                    <Counter to={11} suffix="+" />
                   </div>
                   <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Lift in qualified leads
+                    Projects shipped
                   </div>
                 </div>
                 <div>
-                  <div className="font-display text-5xl font-semibold">
-                    <Counter to={99} suffix=".9%" />
+                  <div className="font-display text-5xl font-semibold text-accent-3">
+                    <Counter to={4} />
                   </div>
                   <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Uptime targets
+                    Continents served
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 pt-8 border-t border-line">
                 <p className="text-fg-soft leading-relaxed">
-                  Studied Computer Science at{" "}
-                  <span className="text-fg under-mark">
-                    Quaid-i-Azam University
-                  </span>
-                  . Now leading distributed teams, integrating Stripe and Twilio,
-                  and shipping AI features that customers actually use — not
-                  just demo well.
+                  I lead distributed teams, integrate Stripe and Twilio, and
+                  ship AI features that customers actually use — not just demo
+                  well.
                 </p>
+              </div>
+
+              {/* Education */}
+              <div className="mt-6 pt-6 border-t border-line flex items-start gap-3">
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-bg-soft border border-line">
+                  <GraduationCap size={15} className="text-accent-2" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">
+                    B.Sc. Computer Science
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted">
+                    Quaid-i-Azam University · Islamabad, PK
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted">2014 – 2018</div>
+                </div>
               </div>
             </div>
           </Reveal>
@@ -178,6 +192,17 @@ export default function About() {
                 </p>
               </motion.div>
             ))}
+
+            {/* Developer code card — spans full width of the 2-col grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: 0.42, ease: [0.16, 1, 0.3, 1] }}
+              className="sm:col-span-2"
+            >
+              <DeveloperCard />
+            </motion.div>
           </div>
         </div>
       </div>

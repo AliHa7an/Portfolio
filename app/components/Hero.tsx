@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { ArrowDownRight, Mail, MapPin } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./BrandIcons";
 import { RevealText } from "./Reveal";
+import TerminalWindow from "./TerminalWindow";
 
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -79,11 +80,37 @@ export default function Hero() {
               into reliable software.
             </motion.p>
 
+            {/* Tech stack chips */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.98, duration: 0.6 }}
+              className="mt-7 flex flex-wrap gap-2"
+            >
+              {[
+                "TypeScript",
+                "React",
+                "Next.js",
+                "NestJS",
+                "Node.js",
+                "AWS",
+                "PostgreSQL",
+                "OpenAI",
+              ].map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-full border border-line-strong bg-surface/40 backdrop-blur px-3 py-1.5 text-[11px] font-mono text-fg-soft"
+                >
+                  {tech}
+                </span>
+              ))}
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.05, duration: 0.7 }}
-              className="mt-10 flex flex-wrap items-center gap-3"
+              transition={{ delay: 1.1, duration: 0.7 }}
+              className="mt-8 flex flex-wrap items-center gap-3"
             >
               <a
                 href="#projects"
@@ -107,7 +134,7 @@ export default function Hero() {
                   { Icon: GithubIcon, href: "https://github.com/AliHa7an" },
                   {
                     Icon: LinkedinIcon,
-                    href: "https://www.linkedin.com/in/alihexan/",
+                    href: "https://www.linkedin.com/in/ali-ha7an/",
                   },
                   { Icon: Mail, href: "mailto:alihexan@gmail.com" },
                 ].map(({ Icon, href }, i) => (
@@ -224,12 +251,22 @@ export default function Hero() {
           </motion.div>
         </div>
 
+        {/* Terminal window — developer signature */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-14 max-w-2xl"
+        >
+          <TerminalWindow />
+        </motion.div>
+
         {/* Scroll cue */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-          className="mt-16 hidden md:flex items-center gap-3 text-xs text-muted"
+          transition={{ delay: 1.7, duration: 0.6 }}
+          className="mt-10 hidden md:flex items-center gap-3 text-xs text-muted"
         >
           <span className="h-px w-10 bg-line-strong" />
           <span className="uppercase tracking-[0.3em]">Scroll</span>

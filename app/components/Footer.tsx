@@ -47,7 +47,7 @@ export default function Footer() {
               <GithubIcon size={16} />
             </a>
             <a
-              href="https://www.linkedin.com/in/alihexan/"
+              href="https://www.linkedin.com/in/ali-ha7an/"
               target="_blank"
               rel="noopener"
               data-cursor="hover"
@@ -66,9 +66,15 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted font-mono">
-          <span>© {year} Ali Hassan — All rights reserved.</span>
-          <span>Crafted in Islamabad, Pakistan.</span>
+        <div className="mt-10 pt-6 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted font-mono">
+          <span>© {year} Ali Hassan. All rights reserved.</span>
+          <span className="flex items-center gap-4">
+            <a href="https://github.com/AliHa7an" target="_blank" rel="noopener" className="hover:text-accent transition-colors" data-cursor="hover">@AliHa7an</a>
+            <span className="h-3 w-px bg-line-strong" />
+            <a href="https://www.linkedin.com/in/ali-ha7an/" target="_blank" rel="noopener" className="hover:text-accent transition-colors" data-cursor="hover">linkedin/ali-ha7an</a>
+            <span className="h-3 w-px bg-line-strong" />
+            <a href="mailto:alihexan@gmail.com" className="hover:text-accent transition-colors" data-cursor="hover">alihexan@gmail.com</a>
+          </span>
         </div>
       </div>
     </footer>

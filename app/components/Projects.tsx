@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import SectionHeader from "./SectionHeader";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Lock } from "lucide-react";
 import { useRef } from "react";
 
 type Project = {
@@ -13,6 +13,7 @@ type Project = {
   tags: string[];
   accent: string;
   category: string;
+  hideLink?: boolean;
 };
 
 const projects: Project[] = [
@@ -20,18 +21,19 @@ const projects: Project[] = [
     title: "Miindset",
     blurb:
       "Mental well-being product with 24/7 AI-powered support — a comprehensive companion for everyday mental health.",
-    url: "https://app.miindset.com",
+    url: "",
     domain: "app.miindset.com",
     tags: ["Next.js", "NestJS", "PostgreSQL", "AWS", "AI"],
     accent: "from-rose-500/30 to-orange-400/20",
     category: "AI · Health",
+    hideLink: true,
   },
   {
     title: "Lisa Law",
     blurb:
       "AI-powered legal assistant — 24/7 guidance, resources, and ready-to-send notices for everyday users on iOS & Android.",
-    url: "https://play.google.com/store/apps/details?id=com.lisalaw.app",
-    domain: "play.google.com / lisalaw",
+    url: "https://play.google.com/store/search?q=lisa+law&c=apps",
+    domain: "Google Play Store",
     tags: ["React Native", "Node.js", "AI"],
     accent: "from-violet-500/30 to-indigo-400/20",
     category: "AI · Mobile",
@@ -70,18 +72,19 @@ const projects: Project[] = [
     title: "Seek My Service Admin",
     blurb:
       "Admin interface on the U.S. DoD Defense Travel System (DTA / ROA modules) — managing permissions, profiles, trips, and invoices.",
-    url: "https://admin-dta.seekmyservice.com/login",
+    url: "",
     domain: "admin-dta.seekmyservice.com",
     tags: ["React", "Node.js", "Enterprise"],
     accent: "from-slate-500/30 to-zinc-400/20",
     category: "Government · Admin",
+    hideLink: true,
   },
   {
     title: "Influence Network",
     blurb:
       "Influencer management suite with Chrome extension, React, NestJS, Next.js, PostgreSQL — deployed on AWS Elastic Beanstalk / EC2 / serverless.",
-    url: "https://influence.network",
-    domain: "influence.network",
+    url: "https://influencenetwork.com/",
+    domain: "influencenetwork.com",
     tags: ["React", "NestJS", "Next.js", "AWS"],
     accent: "from-pink-500/30 to-rose-400/20",
     category: "SaaS",
@@ -100,18 +103,19 @@ const projects: Project[] = [
     title: "AhoyOnCall",
     blurb:
       "Healthcare communication & telehealth platform for on-demand shifts and provider calls.",
-    url: "https://www.ahoyoncall.com",
+    url: "",
     domain: "ahoyoncall.com",
     tags: ["NestJS", "React", "Twilio"],
     accent: "from-blue-500/30 to-indigo-400/20",
     category: "Healthcare",
+    hideLink: true,
   },
   {
     title: "IPGen",
     blurb:
       "Patent lifecycle management platform with social and collaboration features for IP teams.",
-    url: "https://app.ipgen.io/",
-    domain: "app.ipgen.io",
+    url: "https://ipgen.io/",
+    domain: "ipgen.io",
     tags: ["NestJS", "GraphQL", "PostgreSQL"],
     accent: "from-cyan-500/30 to-blue-400/20",
     category: "Legal · SaaS",
@@ -120,16 +124,17 @@ const projects: Project[] = [
     title: "Bosss",
     blurb:
       "Business management and operations solution — workflows, teams, and day-to-day ops in one product.",
-    url: "https://bosss.com",
+    url: "",
     domain: "bosss.com",
     tags: ["Node.js", "MongoDB", "React"],
     accent: "from-orange-500/30 to-amber-400/20",
     category: "Business · SaaS",
+    hideLink: true,
   },
 ];
 
 function ProjectCard({ p, i }: { p: Project; i: number }) {
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const rx = useSpring(useTransform(my, [-50, 50], [8, -8]), {
@@ -157,31 +162,19 @@ function ProjectCard({ p, i }: { p: Project; i: number }) {
     my.set(0);
   };
 
-  return (
-    <motion.a
-      ref={ref}
-      href={p.url}
-      target="_blank"
-      rel="noopener"
-      data-cursor="hover"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        duration: 0.7,
-        delay: (i % 3) * 0.08,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{
-        rotateX: rx,
-        rotateY: ry,
-        transformPerspective: 1000,
-        transformStyle: "preserve-3d",
-      }}
-      className="card-spotlight group relative block rounded-3xl p-7 md:p-8 overflow-hidden"
-    >
+  const sharedMotionProps = {
+    initial: { opacity: 0, y: 40 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-80px" },
+    transition: { duration: 0.7, delay: (i % 3) * 0.08, ease: [0.16, 1, 0.3, 1] as const },
+    onMouseMove: handleMove,
+    onMouseLeave: handleLeave,
+    style: { rotateX: rx, rotateY: ry, transformPerspective: 1000, transformStyle: "preserve-3d" as const },
+    className: "card-spotlight group relative block rounded-3xl p-7 md:p-8 overflow-hidden",
+  };
+
+  const cardInner = (
+    <>
       {/* Tinted gradient backdrop */}
       <div
         className={`absolute inset-0 bg-linear-to-br ${p.accent} opacity-40 group-hover:opacity-70 transition-opacity duration-500`}
@@ -190,8 +183,7 @@ function ProjectCard({ p, i }: { p: Project; i: number }) {
       <div
         className="absolute inset-0 opacity-30 mix-blend-overlay"
         style={{
-          backgroundImage:
-            "radial-gradient(var(--line-strong) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(var(--line-strong) 1px, transparent 1px)",
           backgroundSize: "20px 20px",
         }}
       />
@@ -206,8 +198,8 @@ function ProjectCard({ p, i }: { p: Project; i: number }) {
               {p.title}
             </h3>
           </div>
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-line-strong bg-surface/70 backdrop-blur transition-transform duration-500 group-hover:rotate-45 group-hover:border-accent group-hover:text-accent">
-            <ArrowUpRight size={18} />
+          <div className={`flex h-11 w-11 items-center justify-center rounded-full border border-line-strong bg-surface/70 backdrop-blur transition-transform duration-500 ${p.hideLink ? "opacity-40" : "group-hover:rotate-45 group-hover:border-accent group-hover:text-accent"}`}>
+            {p.hideLink ? <Lock size={16} /> : <ArrowUpRight size={18} />}
           </div>
         </div>
 
@@ -228,26 +220,58 @@ function ProjectCard({ p, i }: { p: Project; i: number }) {
           </div>
           <div className="flex items-center justify-between gap-3 pt-4 border-t border-line">
             <div className="flex items-center gap-2 text-xs text-muted font-mono min-w-0">
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
+              {p.hideLink ? (
+                <span className="h-2 w-2 shrink-0 rounded-full bg-muted/50" />
+              ) : (
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+              )}
               <span className="truncate">{p.domain}</span>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-fg-soft group-hover:text-accent transition-colors shrink-0">
-              <span className="relative overflow-hidden">
-                <span className="block transition-transform duration-500 group-hover:-translate-y-full">
-                  Visit live
-                </span>
-                <span className="absolute inset-0 block translate-y-full transition-transform duration-500 group-hover:translate-y-0 text-accent">
-                  Open site
-                </span>
+            {p.hideLink ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted shrink-0">
+                <Lock size={11} />
+                NDA · Private
               </span>
-              <ExternalLink size={12} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-fg-soft group-hover:text-accent transition-colors shrink-0">
+                <span className="relative overflow-hidden">
+                  <span className="block transition-transform duration-500 group-hover:-translate-y-full">
+                    Visit live
+                  </span>
+                  <span className="absolute inset-0 block translate-y-full transition-transform duration-500 group-hover:translate-y-0 text-accent">
+                    Open site
+                  </span>
+                </span>
+                <ExternalLink size={12} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </span>
+            )}
           </div>
         </div>
       </div>
+    </>
+  );
+
+  if (p.hideLink) {
+    return (
+      <motion.div ref={ref as React.Ref<HTMLDivElement>} {...sharedMotionProps}>
+        {cardInner}
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.a
+      ref={ref as React.Ref<HTMLAnchorElement>}
+      href={p.url}
+      target="_blank"
+      rel="noopener"
+      data-cursor="hover"
+      {...sharedMotionProps}
+    >
+      {cardInner}
     </motion.a>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, Download } from "lucide-react";
@@ -19,6 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("");
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -67,6 +68,15 @@ export default function Navbar() {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="fixed top-0 inset-x-0 z-50"
     >
+      {/* Scroll progress line */}
+      <motion.div
+        className="absolute top-0 inset-x-0 h-[2px] origin-left pointer-events-none"
+        style={{
+          scaleX: scrollYProgress,
+          background:
+            "linear-gradient(to right, var(--accent), var(--accent-2), var(--accent-3))",
+        }}
+      />
       <div className="container-x px-5 py-4">
         <nav
           className={`flex items-center justify-between gap-4 rounded-full border px-4 py-2.5 transition-all duration-500 ${
@@ -141,6 +151,12 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2">
+            <kbd
+              className="hidden lg:inline-flex items-center gap-1 rounded-lg border border-line-strong bg-surface/40 backdrop-blur px-2 py-1 text-[10px] font-mono text-muted select-none"
+              title="Open command palette"
+            >
+              <span>⌘</span><span>K</span>
+            </kbd>
             <a
               href="/Ali_Hassan_Resume.pdf"
               download="Ali_Hassan_Resume.pdf"

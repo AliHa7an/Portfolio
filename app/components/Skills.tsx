@@ -121,11 +121,11 @@ export default function Skills() {
         />
 
         {/* Marquee */}
-        <div className="relative mb-16">
+        <div className="relative mb-16 space-y-3">
           <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-bg to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-y-0 right-0 w-24 bg-linear-to-l from-bg to-transparent z-10 pointer-events-none" />
           <div className="overflow-hidden">
-            <div className="flex marquee-track gap-4 whitespace-nowrap py-3">
+            <div className="flex marquee-track gap-4 whitespace-nowrap py-2">
               {[...marquee, ...marquee].map((m, i) => (
                 <span
                   key={i}
@@ -140,6 +140,29 @@ export default function Skills() {
                           : i % 3 === 1
                           ? "var(--accent-2)"
                           : "var(--accent-3)",
+                    }}
+                  />
+                  {m}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="overflow-hidden">
+            <div className="flex marquee-track-rev gap-4 whitespace-nowrap py-2">
+              {[...marquee].reverse().concat([...marquee].reverse()).map((m, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-2 rounded-full border border-line bg-bg-soft/50 backdrop-blur px-5 py-2 text-sm font-medium text-fg-soft"
+                >
+                  <span
+                    className="h-1.5 w-1.5 rounded-full opacity-60"
+                    style={{
+                      background:
+                        i % 3 === 0
+                          ? "var(--accent-3)"
+                          : i % 3 === 1
+                          ? "var(--accent)"
+                          : "var(--accent-2)",
                     }}
                   />
                   {m}
