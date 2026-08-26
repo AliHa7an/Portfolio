@@ -27,6 +27,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://alihexan.com"),
   title: "Ali Hassan — Senior Full Stack & AI Engineer",
   description:
     "Ali Hassan — Senior Full Stack & AI Engineer with 7+ years building production web, mobile, and AI systems. Expert in React, Next.js, NestJS, TypeScript, AWS, and Vapi voice AI. Available for senior roles and product engagements.",
