@@ -230,3 +230,17 @@ a, button, [data-cursor="hover"] {
 @media (pointer: coarse) {
   a, button, [data-cursor="hover"] { cursor: pointer; }
 }
+
+/* Sound toggle equaliser */
+@keyframes eq {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+.eq-bar {
+  height: 4px;
+  animation: eq 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar { animation: none; height: 10px; }
+}

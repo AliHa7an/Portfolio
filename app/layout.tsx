@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import BackToTop from "./components/BackToTop";
 import CommandPalette from "./components/CommandPalette";
 import ConsoleEgg from "./components/ConsoleEgg";
+import Guide from "./components/Guide";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,12 @@ export const metadata: Metadata = {
     "Ali Hassan",
     "Full Stack Developer",
     "AI Engineer",
+    "AI Agents",
+    "AI Automation",
+    "Agentic AI",
+    "Claude Code",
+    "Python",
+    "MERN Stack",
     "Next.js Developer",
     "React Developer",
     "NestJS",
@@ -87,6 +94,7 @@ export default function RootLayout({
           <Navbar />
           <main className="relative z-10">{children}</main>
           <Footer />
+          <Guide />
           <BackToTop />
           <CommandPalette />
           <ConsoleEgg />

@@ -12,101 +12,46 @@ type Group = {
 const groups: Group[] = [
   {
     label: "Frontend",
-    items: [
-      "React",
-      "Next.js",
-      "React Native",
-      "TypeScript",
-      "Redux",
-      "Tailwind CSS",
-      "Material UI",
-      "SSR / SSG",
-    ],
+    items: ["React", "Next.js", "React Native", "TypeScript", "Redux", "Tailwind CSS", "Material UI", "SSR / SSG"],
   },
   {
     label: "Backend",
-    items: [
-      "Node.js",
-      "NestJS",
-      "Express",
-      "GraphQL",
-      "REST",
-      "Microservices",
-      "Event-Driven",
-      "Prisma",
-    ],
+    items: ["Node.js", "NestJS", "Express", "MERN Stack", "Python", "FastAPI", "GraphQL", "REST", "Microservices", "Event-Driven"],
+  },
+  {
+    label: "AI Agents",
+    items: ["Agentic AI", "AI Agents", "OpenAI APIs", "Vapi Voice AI", "Custom Sales AI", "Chatbots", "Generative AI", "Prompt Engineering"],
+  },
+  {
+    label: "AI Automation",
+    items: ["AI Workflows", "Python Automation", "Claude Code Actions", "Scheduled Pipelines", "Webhooks", "Social API Automation"],
+  },
+  {
+    label: "AI-Assisted Dev",
+    items: ["Claude Code", "Cursor", "OpenAI Codex", "Agentic Coding", "Vibe Coding", "AI Code Review"],
   },
   {
     label: "Databases",
-    items: [
-      "PostgreSQL",
-      "MongoDB",
-      "MySQL",
-      "Redis",
-      "Cosmos DB",
-      "DynamoDB",
-      "Sequelize",
-      "Mongoose",
-    ],
+    items: ["PostgreSQL", "MongoDB", "MySQL", "Supabase", "Redis", "Cosmos DB", "DynamoDB", "Prisma", "Sequelize", "Mongoose"],
   },
   {
     label: "Cloud & DevOps",
-    items: [
-      "AWS",
-      "Azure",
-      "Docker",
-      "GitHub Actions",
-      "Azure DevOps",
-      "Vercel",
-      "Cloudflare",
-      "DigitalOcean",
-    ],
-  },
-  {
-    label: "AI",
-    items: [
-      "OpenAI APIs",
-      "Vapi Voice AI",
-      "Custom Sales AI",
-      "Chatbots",
-      "Generative AI",
-      "Prompt Engineering",
-    ],
+    items: ["AWS", "Azure", "Docker", "GitHub Actions", "Azure DevOps", "Vercel", "Cloudflare", "DigitalOcean"],
   },
   {
     label: "Integrations",
-    items: [
-      "Stripe",
-      "PayPal",
-      "Twilio",
-      "Auth0",
-      "Azure AD",
-      "Apple IAP",
-      "Google IAP",
-      "OAuth 2.0",
-    ],
+    items: ["Stripe", "PayPal", "Twilio", "Auth0", "Azure AD", "Apple IAP", "Google IAP", "OAuth 2.0"],
+  },
+  {
+    label: "Motion & Media",
+    items: ["Remotion", "GSAP", "Framer Motion", "Three.js", "Lenis", "Tone.js"],
   },
 ];
 
 const marquee = [
-  "React",
-  "Next.js",
-  "TypeScript",
-  "NestJS",
-  "Node.js",
-  "GraphQL",
-  "PostgreSQL",
-  "MongoDB",
-  "AWS",
-  "Azure",
-  "Docker",
-  "Vapi",
-  "OpenAI",
-  "React Native",
-  "Tailwind",
-  "Stripe",
-  "Auth0",
-  "Redis",
+  "React", "Next.js", "TypeScript", "NestJS", "Node.js", "MERN", "Python", "AI Agents", "Claude Code",
+  "GraphQL", "PostgreSQL", "MongoDB", "AWS", "Azure", "Docker", "Vapi", "OpenAI", "React Native",
+  "Tailwind", "Stripe", "Auth0", "Redis",
 ];
 
 export default function Skills() {
@@ -117,7 +62,7 @@ export default function Skills() {
           index="02"
           kicker="Toolkit"
           title="Modern stack, picked for what actually ships."
-          description="Languages and tools I reach for daily. Deep on TypeScript, the React/Next ecosystem, NestJS on the server, and the Vapi/OpenAI side of the AI stack."
+          description="Languages and tools I reach for daily. Deep on TypeScript, the React/Next ecosystem, NestJS and Python on the server, and AI agents, voice and automation built on OpenAI, Vapi and Claude."
         />
 
         {/* Marquee */}

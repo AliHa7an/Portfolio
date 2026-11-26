@@ -49,7 +49,7 @@ const highlights = [
   {
     Icon: Brain,
     title: "Production AI Systems",
-    body: "Vapi voice assistants, OpenAI-powered chatbots, generative AI features that move metrics.",
+    body: "AI agents, Vapi voice assistants, OpenAI chatbots and automated AI workflows that move metrics.",
   },
   {
     Icon: Cloud,

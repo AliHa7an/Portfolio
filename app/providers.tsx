@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { SoundProvider } from "./components/SoundProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      {children}
+      <SoundProvider>{children}</SoundProvider>
     </ThemeProvider>
   );
 }

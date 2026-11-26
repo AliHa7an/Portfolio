@@ -76,7 +76,7 @@ export default function Hero() {
               <span className="text-fg font-medium">Ali Hassan</span> — 7+ years
               building production-grade web, mobile, and AI systems for clients
               across the US, UK, Australia, and the Middle East. I architect
-              microservices, ship Vapi voice assistants, and turn fuzzy ideas
+              microservices, ship AI agents and voice assistants, and turn fuzzy ideas
               into reliable software.
             </motion.p>
 
@@ -121,6 +121,17 @@ export default function Hero() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-bg text-fg transition-transform group-hover:rotate-45">
                   <ArrowDownRight size={16} />
                 </span>
+              </a>
+              <a
+                href="#story"
+                className="inline-flex items-center gap-2 rounded-full border border-accent/60 bg-accent/10 backdrop-blur px-5 py-3 text-sm font-medium hover:bg-accent/20 transition-colors"
+                data-cursor="hover"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                </span>
+                Watch the 40s tour
               </a>
               <a
                 href="#contact"

@@ -6,8 +6,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, Download } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import { SoundToggle } from "./SoundProvider";
 
 const links = [
+  { id: "story", label: "Story" },
   { id: "about", label: "About" },
   { id: "skills", label: "Skills" },
   { id: "experience", label: "Experience" },
@@ -177,6 +179,7 @@ export default function Navbar() {
                 />
               </span>
             </a>
+            <SoundToggle />
             <ThemeToggle />
             <button
               aria-label="Open menu"
