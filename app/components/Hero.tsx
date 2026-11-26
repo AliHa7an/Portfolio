@@ -81,7 +81,7 @@ export default function Hero() {
                 }}
               >
                 <Image
-                  src="/avatar/hero.webp"
+                  src="/avatar/v2/hero.webp"
                   alt="Ali Hassan's avatar, standing in a charcoal suit and navy tie"
                   width={422}
                   height={1402}

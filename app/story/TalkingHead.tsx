@@ -50,7 +50,7 @@ export function MouthPatch({ which, mouth }: { which: keyof typeof MOUTH_PATCH; 
         top: `${box.y}%`,
         width: `${box.w}%`,
         height: `${box.h}%`,
-        backgroundImage: `url(/avatar/mouth-${which}.webp)`,
+        backgroundImage: `url(/avatar/v2/mouth-${which}.webp)`,
         backgroundRepeat: "no-repeat",
         backgroundSize: `${MOUTHS.length * 100}% 100%`,
         backgroundPosition: `${(i / (MOUTHS.length - 1)) * 100}% 0`,

@@ -61,7 +61,7 @@ export default function Guide() {
 
   // Load his mouth shapes before he first speaks.
   useEffect(() => {
-    for (const n of [0, 3, 4]) new Image().src = `/avatar/mouth-${n}.webp`;
+    for (const n of [0, 3, 4]) new Image().src = `/avatar/v2/mouth-${n}.webp`;
   }, []);
 
   // Which section is on screen. Stays away over the hero and the story stage.

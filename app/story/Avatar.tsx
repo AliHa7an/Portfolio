@@ -52,7 +52,7 @@ export function Avatar({ pose, t = 0, mouth, height, style, className }: AvatarP
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={p}
-          src={`/avatar/pose-${POSES[p]}.webp`}
+          src={`/avatar/v2/pose-${POSES[p]}.webp`}
           alt=""
           width={459}
           height={1200}
