@@ -9,6 +9,7 @@ const links = [
   { id: "story", label: "Tour" },
   { id: "about", label: "About" },
   { id: "skills", label: "Skills" },
+  { id: "services", label: "Services" },
   { id: "experience", label: "Experience" },
   { id: "projects", label: "Work" },
   { id: "contact", label: "Contact" },
@@ -52,7 +53,7 @@ export default function Navbar() {
           Ali Hassan
         </a>
 
-        <ul className="hidden items-center gap-7 lg:flex">
+        <ul className="hidden items-center gap-6 lg:flex">
           {links.map((l) => (
             <li key={l.id}>
               <a

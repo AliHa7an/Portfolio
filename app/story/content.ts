@@ -125,8 +125,20 @@ export const SHIPPED = [
 /** Lines the floating guide says as each page section scrolls into view. */
 export const GUIDE_LINES: Record<string, string> = {
   about: "This is how I work: end to end, from system design to the cloud it runs on.",
-  skills: "My toolkit. The three AI rows are where most of my recent work has been.",
+  skills: "This is my toolkit. Press Listen on any row and I will tell you how I use it.",
+  services: "You can hire me directly. Websites and stores are a fixed 120 dollars, and I quote AI agents and bots per project.",
   experience: "Six companies since 2018. Each entry shows what I owned and the stack I used.",
   projects: "Real products with real users. The ones with a live link open in a new tab.",
-  contact: "That's me. If you have a role or a product in mind, write to me here.",
+  contact: "That's me. If you have a role or a product in mind, write to me, or message me on WhatsApp.",
 };
+
+export const WHATSAPP_NUMBER = "923115427994";
+
+export function whatsappLink(message: string) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+/** Ask the on-page avatar to say something out loud. */
+export function askGuide(text: string) {
+  window.dispatchEvent(new CustomEvent("guide:say", { detail: { text } }));
+}

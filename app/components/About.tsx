@@ -39,7 +39,7 @@ export default function About() {
         <div className="grid gap-12 lg:grid-cols-12">
           <dl className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:col-span-8">
             {areas.map((a) => (
-              <div key={a.title} className="border-t-[3px] border-fg pt-4">
+              <div key={a.title} className="rise border-t-[3px] border-fg pt-4">
                 <dt className="font-display text-xl font-bold tracking-tight">{a.title}</dt>
                 <dd className="mt-2 text-fg-soft">{a.body}</dd>
               </div>

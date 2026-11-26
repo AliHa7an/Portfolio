@@ -17,12 +17,13 @@ const jobs: Job[] = [
     location: "Remote",
     bullets: [
       "Lead end-to-end development of scalable web and mobile platforms — owning architecture across diverse client engagements.",
-      "Built generative AI features and Vapi-powered conversational bots; custom AI sales assistants lifted lead qualification by 25%+.",
+      "Built AI agents and agentic workflows on OpenAI APIs that carry out multi-step tasks inside client products.",
+      "Shipped AI chatbots and Vapi voice bots, including custom AI sales assistants that lifted lead qualification by 25%+.",
       "Architected microservices in NestJS, Node, TypeScript & Express for modular, independently deployable services.",
       "Cut deployment time from hours to under 15 minutes via Azure DevOps and GitHub Actions pipelines.",
       "Shipped React Native apps to iOS & Android with in-app subscriptions through TestFlight and Play Console.",
     ],
-    stack: ["Next.js", "NestJS", "Vapi", "Azure", "AWS", "React Native"],
+    stack: ["AI agents", "Agentic workflows", "Chatbots", "Vapi voice bots", "OpenAI", "Next.js", "NestJS", "React Native", "Azure", "AWS"],
   },
   {
     company: "HCR International (formerly EdgeLabs)",
@@ -95,7 +96,7 @@ export default function Experience() {
         />
         <ol>
           {jobs.map((j) => (
-            <li key={j.company + j.period} className="grid gap-x-8 gap-y-3 border-t border-line-strong py-8 md:grid-cols-12 md:py-10">
+            <li key={j.company + j.period} className="rise grid gap-x-8 gap-y-3 border-t border-line-strong py-8 md:grid-cols-12 md:py-10">
               <div className="md:col-span-4">
                 <p className="font-medium">{j.period.replace(" — ", " to ")}</p>
                 <p className="text-fg-soft">{j.location}</p>

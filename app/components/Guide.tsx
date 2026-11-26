@@ -36,8 +36,10 @@ const hiddenStore = {
  * Ali's avatar walks the page with the visitor: as each section scrolls into
  * view he waves, then explains it in a speech bubble.
  */
+type Line = { key: string; text: string; asked: boolean };
+
 export default function Guide() {
-  const [section, setSection] = useState<string | null>(null);
+  const [line, setLine] = useState<Line | null>(null);
   const hidden = useSyncExternalStore(hiddenStore.subscribe, hiddenStore.get, () => false);
 
   // Which section is on screen. Stays away over the hero and the story stage.
@@ -49,7 +51,9 @@ export default function Guide() {
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) setSection(e.target.id in GUIDE_LINES ? e.target.id : null);
+          if (!e.isIntersecting) continue;
+          const id = e.target.id;
+          setLine(id in GUIDE_LINES ? { key: id, text: GUIDE_LINES[id], asked: false } : null);
         }
       },
       { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
@@ -58,9 +62,20 @@ export default function Guide() {
     return () => io.disconnect();
   }, []);
 
+  // A Listen button anywhere on the page can ask him to say a specific line.
+  useEffect(() => {
+    let n = 0;
+    const onSay = (e: Event) => {
+      const text = (e as CustomEvent<{ text: string }>).detail?.text;
+      if (text) setLine({ key: `asked-${++n}`, text, asked: true });
+    };
+    window.addEventListener("guide:say", onSay);
+    return () => window.removeEventListener("guide:say", onSay);
+  }, []);
+
   return (
     <AnimatePresence>
-      {section && (
+      {line && (
         <motion.div
           key="guide"
           initial={{ opacity: 0, y: 60 }}
@@ -70,9 +85,10 @@ export default function Guide() {
           className="pointer-events-none fixed bottom-0 left-3 z-40 flex items-end md:left-6"
         >
           <GuideBody
-            key={section}
-            line={GUIDE_LINES[section]}
-            quiet={hidden}
+            key={line.key}
+            line={line.text}
+            asked={line.asked}
+            quiet={hidden && !line.asked}
             onQuiet={hiddenStore.set}
           />
         </motion.div>
@@ -87,25 +103,28 @@ export default function Guide() {
  */
 function GuideBody({
   line,
+  asked,
   quiet,
   onQuiet,
 }: {
   line: string;
+  asked: boolean;
   quiet: boolean;
   onQuiet: (v: boolean) => void;
 }) {
   const [reduce] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const end = 12 + line.length + 70;
+  // Typing runs at about speaking pace, then he lingers for three seconds.
+  const end = 12 + Math.ceil(line.length * 1.35) + 60;
   const [tick, setTick] = useState(quiet ? end : 0);
-  const chimed = useRef(false);
-  const { play } = useSound();
+  const spoken = useRef(false);
+  const { say, hush } = useSound();
   const speaking = tick < end;
 
   useEffect(() => {
-    if (chimed.current || quiet) return;
-    chimed.current = true;
-    play("chime");
-  }, [play, quiet]);
+    if (spoken.current || quiet) return;
+    spoken.current = true;
+    say(line, asked);
+  }, [say, line, asked, quiet]);
 
   // One 20fps clock for the typewriter, the pose changes and the idle sway.
   useEffect(() => {
@@ -121,19 +140,20 @@ function GuideBody({
         onClick={() => {
           onQuiet(false);
           setTick(0);
+          say(line, true);
         }}
         aria-label="Hear about this section"
         className="pointer-events-auto mb-4 h-16 w-16 overflow-hidden rounded-full border-[1.5px] border-fg bg-sun"
       >
         <span className="flex justify-center pt-1.5">
-          <Avatar pose="idle" height={210} plain />
+          <Avatar pose="idle" height={210} />
         </span>
       </button>
     );
   }
 
   const t = tick * 0.05;
-  const typed = reduce ? line.length : Math.min(line.length, Math.max(0, tick - 12));
+  const typed = reduce ? line.length : Math.min(line.length, Math.max(0, Math.floor((tick - 12) / 1.35)));
   const talking = typed > 0 && typed < line.length;
   let pose: Pose = "idle";
   if (!reduce && tick <= 24) pose = wavingPose(t);
@@ -143,14 +163,14 @@ function GuideBody({
     <>
       <div className="relative shrink-0">
         <div aria-hidden className="absolute left-1/2 top-[12%] aspect-square w-[150%] -translate-x-1/2 rounded-full bg-sun" />
-        <Avatar pose={pose} t={reduce ? 0 : t} height="clamp(120px, 24vh, 220px)" />
+        <Avatar pose={pose} t={reduce ? 0 : t} height="clamp(110px, 20vh, 210px)" />
       </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9, x: -10 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ delay: 0.3, duration: 0.3 }}
         role="status"
-        className="pointer-events-auto relative mb-[clamp(72px,15vh,140px)] ml-3 max-w-[min(62vw,300px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
+        className="pointer-events-auto relative mb-[clamp(60px,12vh,130px)] ml-3 max-w-[min(62vw,300px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
       >
         <span className="sr-only">{line}</span>
         <span aria-hidden>
@@ -161,6 +181,7 @@ function GuideBody({
           type="button"
           onClick={() => {
             onQuiet(true);
+            hush();
             setTick(end);
           }}
           aria-label="Stop the guide"

@@ -7,6 +7,9 @@ import { PortfolioStory } from "../story/PortfolioStory";
 import { SCENES, STORY_DURATION, STORY_FPS } from "../story/content";
 import { useSound } from "./SoundProvider";
 
+/** Scroll position 0 maps to this frame: the intro is already on screen. */
+const FIRST_FRAME = 50;
+
 /**
  * A pinned stage. Scrolling through this tall section scrubs a Remotion
  * composition frame by frame, so the page plays like a film under the
@@ -17,12 +20,15 @@ export default function StorySection() {
   const playerRef = useRef<PlayerRef>(null);
   const tourRef = useRef<number | null>(null);
   const sceneRef = useRef(0);
+  const frameRef = useRef(-1);
   const [mounted, setMounted] = useState(false);
   const [portrait, setPortrait] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [touring, setTouring] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { play } = useSound();
+  const { play, say, hush } = useSound();
+  const touringRef = useRef(false);
+  const [near, setNear] = useState(false);
 
   useEffect(() => {
     const mqP = window.matchMedia("(max-width: 767px)");
@@ -57,13 +63,21 @@ export default function StorySection() {
       const range = scrollRange();
       if (!range) return;
       const p = Math.min(1, Math.max(0, (window.scrollY - range.top) / range.length));
-      const frame = Math.round(p * (STORY_DURATION - 1));
-      playerRef.current?.seekTo(frame);
+      // Start a little way in, so the stage is never empty when it scrolls into view.
+      const frame = Math.round(FIRST_FRAME + p * (STORY_DURATION - 1 - FIRST_FRAME));
+      if (frame !== frameRef.current) {
+        frameRef.current = frame;
+        playerRef.current?.seekTo(frame);
+      }
       setProgress(p);
       const idx = SCENES.findIndex((s) => frame < s.from + s.duration);
       if (idx !== -1 && idx !== sceneRef.current) {
         sceneRef.current = idx;
-        if (p > 0 && p < 1) play("whoosh");
+        if (p > 0 && p < 1) {
+          play("whoosh");
+          // He narrates while the tour plays itself; scrubbing by hand stays quiet.
+          if (touringRef.current) say(SCENES[idx].line);
+        }
       }
     };
     const onScroll = () => {
@@ -77,13 +91,15 @@ export default function StorySection() {
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [mounted, reduced, scrollRange, play]);
+  }, [mounted, reduced, near, scrollRange, play, say]);
 
   const stopTour = useCallback(() => {
     if (tourRef.current) cancelAnimationFrame(tourRef.current);
     tourRef.current = null;
+    if (touringRef.current) hush();
+    touringRef.current = false;
     setTouring(false);
-  }, []);
+  }, [hush]);
 
   const startTour = useCallback(
     (fromStart: boolean) => {
@@ -93,10 +109,15 @@ export default function StorySection() {
         ? range.top
         : Math.min(range.top + range.length, Math.max(range.top, window.scrollY));
       const endY = range.top + range.length;
-      const fullMs = (STORY_DURATION / STORY_FPS) * 1000;
+      const fullMs = ((STORY_DURATION - FIRST_FRAME) / STORY_FPS) * 1000;
       const ms = Math.max(400, ((endY - startY) / range.length) * fullMs);
       const t0 = performance.now();
+      touringRef.current = true;
       setTouring(true);
+      const startP = (startY - range.top) / range.length;
+      const startFrame = FIRST_FRAME + startP * (STORY_DURATION - 1 - FIRST_FRAME);
+      const first = SCENES.find((s) => startFrame < s.from + s.duration);
+      if (first) say(first.line);
       const step = (now: number) => {
         const k = Math.min(1, (now - t0) / ms);
         window.scrollTo({ top: startY + (endY - startY) * k, behavior: "instant" });
@@ -105,7 +126,7 @@ export default function StorySection() {
       };
       tourRef.current = requestAnimationFrame(step);
     },
-    [scrollRange, stopTour]
+    [scrollRange, stopTour, say]
   );
 
   // Any manual scroll input hands control back to the visitor.
@@ -127,10 +148,27 @@ export default function StorySection() {
 
   useEffect(() => stopTour, [stopTour]);
 
+  // Mount the player only when the stage is about to come on screen.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "100% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const done = progress > 0.985;
   const size = portrait ? { w: 720, h: 1040 } : { w: 1280, h: 720 };
 
-  const stage = mounted ? (
+  const stage = mounted && near ? (
     <Player
       key={`${portrait}-${reduced}`}
       ref={playerRef}
@@ -142,6 +180,7 @@ export default function StorySection() {
       controls={reduced}
       loop={false}
       autoPlay={false}
+      initialFrame={FIRST_FRAME}
       clickToPlay={reduced}
       doubleClickToFullscreen={false}
       spaceKeyToPlayOrPause={false}
@@ -157,7 +196,7 @@ export default function StorySection() {
       ref={sectionRef}
       aria-label="Animated tour of Ali Hassan's portfolio"
       className="relative z-[2]"
-      style={{ height: reduced ? "auto" : "520vh" }}
+      style={{ height: reduced ? "auto" : "400vh" }}
     >
       <div
         className={
@@ -179,10 +218,7 @@ export default function StorySection() {
         </div>
 
         {!reduced && (
-          <div className="mt-4 flex w-full max-w-[1180px] items-center justify-between gap-4 px-1">
-            <p className="text-fg-soft">
-              {touring ? "Playing. Scroll to take over." : done ? "That is the end of the tour." : "Scroll to play the tour."}
-            </p>
+          <div className="mt-4 flex w-full max-w-[1180px] items-center gap-4 px-1">
             <button
               type="button"
               onClick={() => (touring ? stopTour() : startTour(done))}
@@ -191,6 +227,9 @@ export default function StorySection() {
               {touring ? <Pause size={15} aria-hidden /> : done ? <RotateCcw size={15} aria-hidden /> : <Play size={15} fill="currentColor" aria-hidden />}
               {touring ? "Pause" : done ? "Replay" : "Play it for me"}
             </button>
+            <p className="text-fg-soft">
+              {touring ? "Playing. Scroll to take over." : done ? "That is the end of the tour." : "Scroll to play the tour."}
+            </p>
           </div>
         )}
       </div>

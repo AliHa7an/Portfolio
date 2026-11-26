@@ -14,16 +14,43 @@ import { VolumeX } from "lucide-react";
 type SoundName = "hover" | "click" | "chime" | "whoosh";
 
 type SoundApi = {
+  /** Voice, music and interface sounds are on. */
   on: boolean;
   toggle: () => void;
   play: (name: SoundName) => void;
+  /**
+   * Speak a line in English. Ambient lines only play when sound is on;
+   * pass force for a line the visitor explicitly asked to hear.
+   */
+  say: (text: string, force?: boolean) => void;
+  hush: () => void;
 };
 
 const SoundContext = createContext<SoundApi>({
   on: false,
   toggle: () => {},
   play: () => {},
+  say: () => {},
+  hush: () => {},
 });
+
+/** Best available English voice, preferring a natural male one. */
+function pickVoice(): SpeechSynthesisVoice | null {
+  const english = window.speechSynthesis.getVoices().filter((v) => /^en[-_]/i.test(v.lang));
+  const wanted = [
+    /Microsoft (Andrew|Brian|Guy|Ryan|Davis|Christopher).*(Natural|Online)/i,
+    /Google UK English Male/i,
+    /\b(Daniel|Arthur|Oliver|Aaron|Evan)\b/i,
+    /Microsoft (Guy|Ryan|David|Mark|George)/i,
+    /\bMale\b/i,
+    /Google US English/i,
+  ];
+  for (const re of wanted) {
+    const v = english.find((voice) => re.test(voice.name));
+    if (v) return v;
+  }
+  return english[0] ?? null;
+}
 
 export const useSound = () => useContext(SoundContext);
 
@@ -31,6 +58,8 @@ type Engine = {
   play: (name: SoundName) => void;
   start: () => void;
   stop: () => void;
+  /** Lower the music while the avatar is speaking. */
+  duck: (down: boolean) => void;
 };
 
 /**
@@ -126,6 +155,9 @@ async function createEngine(): Promise<Engine> {
         // A note scheduled in the past throws; a missed blip is harmless.
       }
     },
+    duck(down) {
+      master.gain.rampTo(down ? 0.22 : 0.9, 0.35);
+    },
     start() {
       chordLoop.start(0);
       bellLoop.start("1m");
@@ -149,26 +181,63 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
   const engine = useRef<Engine | null>(null);
   const loading = useRef(false);
 
+  const hush = useCallback(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    engine.current?.duck(false);
+  }, []);
+
+  const speakNow = useCallback((text: string) => {
+    if (!("speechSynthesis" in window)) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const voice = pickVoice();
+    if (voice) u.voice = voice;
+    u.lang = voice?.lang ?? "en-US";
+    u.rate = 1.02;
+    u.pitch = 0.92;
+    u.onstart = () => engine.current?.duck(true);
+    u.onend = u.onerror = () => engine.current?.duck(false);
+    synth.speak(u);
+  }, []);
+
+  const say = useCallback(
+    (text: string, force?: boolean) => {
+      if (on || force) speakNow(text);
+    },
+    [on, speakNow]
+  );
+
+  // Voices load asynchronously in some browsers; ask early so the first line is not late.
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.getVoices();
+    return () => window.speechSynthesis.cancel();
+  }, []);
+
   const toggle = useCallback(() => {
     if (loading.current) return;
     if (on) {
       engine.current?.stop();
+      hush();
       setOn(false);
       return;
     }
+    // Speak inside the click itself: browsers only allow speech after a gesture.
+    speakNow("Sound is on. Scroll down and I will talk you through my work.");
     loading.current = true;
     (engine.current ? Promise.resolve(engine.current) : createEngine())
       .then((e) => {
         engine.current = e;
         e.start();
-        e.play("chime");
+        e.duck(window.speechSynthesis?.speaking ?? false);
         setOn(true);
       })
       .catch(() => setOn(false))
       .finally(() => {
         loading.current = false;
       });
-  }, [on]);
+  }, [on, hush, speakNow]);
 
   const play = useCallback(
     (name: SoundName) => {
@@ -209,7 +278,7 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("visibilitychange", vis);
   }, [on]);
 
-  const value = useMemo(() => ({ on, toggle, play }), [on, toggle, play]);
+  const value = useMemo(() => ({ on, toggle, play, say, hush }), [on, toggle, play, say, hush]);
   return <SoundContext.Provider value={value}>{children}</SoundContext.Provider>;
 }
 
@@ -220,8 +289,7 @@ export function SoundToggle() {
       type="button"
       onClick={toggle}
       aria-pressed={on}
-      aria-label={on ? "Turn sound off" : "Turn sound on"}
-      title={on ? "Sound on" : "Sound off"}
+      aria-label={on ? "Turn voice and sound off" : "Turn voice and sound on"}
       className="flex h-10 items-center gap-2 rounded-xl border-[1.5px] border-line-strong px-3 text-[0.95rem] font-medium hover:border-fg transition-colors"
     >
       {on ? (
@@ -233,7 +301,7 @@ export function SoundToggle() {
       ) : (
         <VolumeX size={17} aria-hidden />
       )}
-      <span className="hidden md:inline">{on ? "Sound on" : "Sound off"}</span>
+      <span className="hidden md:inline">{on ? "Voice on" : "Voice off"}</span>
     </button>
   );
 }
