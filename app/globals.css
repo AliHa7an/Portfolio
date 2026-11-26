@@ -17,6 +17,7 @@
   --muted: #68718a;
   --line: rgba(15, 26, 58, 0.12);
   --line-strong: rgba(15, 26, 58, 0.24);
+  --raised: #ffffff;
   --accent: #2b4eff;
   --sun: #ffc933;
   --on-sun: #0f1a3a;
@@ -26,22 +27,29 @@
   --font-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
+/*
+  Dark is a night version of the same room, not an inversion: near-black ink
+  walls, raised navy surfaces, warm off-white type, and the same yellow as the
+  only light source.
+*/
 .dark {
-  --bg: #0a1027;
-  --bg-soft: #111938;
-  --surface: #141d42;
-  --fg: #f3f4f6;
-  --fg-soft: #c5cbdc;
-  --muted: #8c95b0;
-  --line: rgba(243, 244, 246, 0.12);
-  --line-strong: rgba(243, 244, 246, 0.26);
-  --accent: #93a6ff;
+  --bg: #090c18;
+  --bg-soft: #0f1326;
+  --surface: #121733;
+  --raised: #1a2148;
+  --fg: #f4f5f8;
+  --fg-soft: #bcc3d8;
+  --muted: #8088a4;
+  --line: rgba(244, 245, 248, 0.1);
+  --line-strong: rgba(244, 245, 248, 0.22);
+  --accent: #ffc933;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-soft: var(--bg-soft);
   --color-surface: var(--surface);
+  --color-raised: var(--raised);
   --color-fg: var(--fg);
   --color-fg-soft: var(--fg-soft);
   --color-muted: var(--muted);
@@ -72,6 +80,7 @@ html {
 }
 
 body {
+  transition: background-color 0.25s ease, color 0.25s ease;
   overflow-x: hidden;
   font-size: 1.0625rem;
   line-height: 1.6;
@@ -137,10 +146,15 @@ body {
   font-weight: 600;
   font-size: 1rem;
   line-height: 1.2;
-  transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+  /* Fast ease-out on transform and colour only: feels instant, never floaty. */
+  transition:
+    transform 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    box-shadow 0.16s ease-out;
 }
 .btn:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 .btn-primary {
   background: var(--fg);
@@ -149,12 +163,30 @@ body {
 .btn-primary:hover {
   background: color-mix(in oklab, var(--fg) 86%, var(--accent));
 }
+.dark .btn-primary {
+  background: var(--sun);
+  color: var(--on-sun);
+}
+.dark .btn-primary:hover {
+  background: #ffd75e;
+}
 .btn-quiet {
   border: 1.5px solid var(--line-strong);
   color: var(--fg);
 }
 .btn-quiet:hover {
   border-color: var(--fg);
+}
+.dark .btn-quiet {
+  background: var(--surface);
+}
+
+/* A panel that sits above the page: white in light, raised navy at night. */
+.raised {
+  background: var(--raised);
+}
+.dark .raised {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px var(--line);
 }
 }
 
@@ -203,4 +235,12 @@ body {
   .hero-figure {
     animation: step-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
   }
+}
+
+/* At night the yellow hero panel is the lamp: it throws a little warm light. */
+.dark .hero-glow {
+  background-image: radial-gradient(52rem 34rem at 82% 8%, rgba(255, 201, 51, 0.11), transparent 70%);
+}
+.dark .hero-panel {
+  box-shadow: 0 0 0 1px rgba(255, 201, 51, 0.5), 0 40px 120px -40px rgba(255, 201, 51, 0.35);
 }

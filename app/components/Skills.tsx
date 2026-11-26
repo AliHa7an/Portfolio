@@ -26,7 +26,7 @@ export default function Skills() {
   }, []);
 
   return (
-    <section id="skills" className="section bg-surface">
+    <section id="skills" className="section bg-surface dark:border-y dark:border-line">
       <div className="container-x">
         <SectionHeader
           title="What I work with"

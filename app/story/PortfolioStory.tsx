@@ -23,7 +23,19 @@ import {
   type Scene,
 } from "./content";
 
-const C = {
+type Palette = {
+  bg: string;
+  surface: string;
+  line: string;
+  fg: string;
+  soft: string;
+  muted: string;
+  sun: string;
+  /** Text colour on a yellow field; the same in both themes. */
+  onSun: string;
+};
+
+const LIGHT: Palette = {
   bg: "#f3f4f6",
   surface: "#ffffff",
   line: "rgba(15,26,58,0.16)",
@@ -31,7 +43,22 @@ const C = {
   soft: "#3b4663",
   muted: "#68718a",
   sun: "#ffc933",
+  onSun: "#0f1a3a",
 };
+
+const DARK: Palette = {
+  bg: "#0f1326",
+  surface: "#1a2148",
+  line: "rgba(244,245,248,0.16)",
+  fg: "#f4f5f8",
+  soft: "#c3c9dd",
+  muted: "#8a93b0",
+  sun: "#ffc933",
+  onSun: "#0f1a3a",
+};
+
+const PaletteContext = React.createContext<{ C: Palette; dark: boolean }>({ C: LIGHT, dark: false });
+const usePalette = () => React.useContext(PaletteContext).C;
 
 const DISPLAY = "var(--font-display), system-ui, sans-serif";
 const TEXT = "var(--font-text), system-ui, sans-serif";
@@ -74,6 +101,7 @@ function SceneShell({ scene, wide, children }: { scene: Scene; wide?: boolean; c
 }
 
 function Heading({ children, delay = 4 }: { children: string; delay?: number }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { pick } = useLayout();
@@ -105,6 +133,7 @@ function Heading({ children, delay = 4 }: { children: string; delay?: number }) 
 /* ─── Scenes ─────────────────────────────────────────────── */
 
 function Intro({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const { pick, portrait } = useLayout();
   const sub = usePop(34);
   const chips = ["Full Stack", "AI Agents", "Automation", "Voice AI"];
@@ -179,6 +208,7 @@ function Word({ children, delay }: { children: string; delay: number }) {
 }
 
 function Chip({ children, delay, accent }: { children: React.ReactNode; delay: number; accent?: string }) {
+  const C = usePalette();
   const p = usePop(delay, 12);
   const { pick } = useLayout();
   return (
@@ -206,6 +236,7 @@ function Chip({ children, delay, accent }: { children: React.ReactNode; delay: n
 }
 
 function Numbers({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { pick, portrait } = useLayout();
   const places = ["United States", "United Kingdom", "Australia", "Middle East"];
@@ -240,7 +271,7 @@ function Numbers({ scene }: { scene: Scene }) {
                   fontStretch: "84%",
                   fontSize: pick(128, 84),
                   lineHeight: 1,
-                  color: C.fg,
+                  color: i === 0 ? C.onSun : C.fg,
                   minWidth: portrait ? 150 : undefined,
                   fontVariantNumeric: "tabular-nums",
                 }}
@@ -248,7 +279,7 @@ function Numbers({ scene }: { scene: Scene }) {
                 {n}
                 {s.suffix}
               </div>
-              <div style={{ fontSize: pick(26, 28), color: C.soft }}>{s.label}</div>
+              <div style={{ fontSize: pick(26, 28), color: i === 0 ? C.onSun : C.soft }}>{s.label}</div>
             </div>
           );
         })}
@@ -291,6 +322,7 @@ function StackColumn({
   group: (typeof STACK)[number];
   delay: number;
 }) {
+  const C = usePalette();
   const p = usePop(delay);
   const frame = useCurrentFrame();
   const { pick, portrait } = useLayout();
@@ -336,6 +368,7 @@ function StackColumn({
 }
 
 function Ai({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { pick, portrait } = useLayout();
   return (
@@ -366,7 +399,7 @@ function Ai({ scene }: { scene: Scene }) {
                   display: "inline-block",
                   fontSize: pick(18, 19),
                   fontWeight: 600,
-                  color: C.fg,
+                  color: C.onSun,
                   padding: "6px 14px",
                   borderRadius: 10,
                   background: C.sun,
@@ -383,6 +416,7 @@ function Ai({ scene }: { scene: Scene }) {
 }
 
 function Journey({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { portrait } = useLayout();
   const draw = interpolate(frame, [16, 130], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
@@ -495,6 +529,7 @@ function Journey({ scene }: { scene: Scene }) {
 }
 
 function Projects({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { pick, portrait } = useLayout();
   return (
@@ -538,6 +573,7 @@ function Projects({ scene }: { scene: Scene }) {
 }
 
 function Cta({ scene }: { scene: Scene }) {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { pick } = useLayout();
   const p = usePop(30);
@@ -589,10 +625,12 @@ function Cta({ scene }: { scene: Scene }) {
 /* ─── Persistent layers ──────────────────────────────────── */
 
 function Backdrop() {
+  const C = usePalette();
   return <AbsoluteFill style={{ background: C.bg }} />;
 }
 
 function TopBar() {
+  const C = usePalette();
   const frame = useCurrentFrame();
   const { pick, portrait } = useLayout();
   const idx = Math.max(0, SCENES.findIndex((s) => frame < s.from + s.duration));
@@ -638,6 +676,7 @@ function TopBar() {
 
 /** The avatar and its speech bubble, visible across every scene. */
 function Narrator() {
+  const { C, dark } = React.useContext(PaletteContext);
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const { pick, portrait } = useLayout();
@@ -680,18 +719,32 @@ function Narrator() {
 
   return (
     <>
-      {/* He always stands in front of the yellow disc. */}
+      {/* He always stands in front of yellow: a disc by day, a full arch at night. */}
       <div
-        style={{
-          position: "absolute",
-          left: x + w / 2 - h * 0.36,
-          top: y + h * 0.1,
-          width: h * 0.72,
-          height: h * 0.72,
-          borderRadius: "50%",
-          background: C.sun,
-          transform: `scale(${enter})`,
-        }}
+        style={
+          dark
+            ? {
+                position: "absolute",
+                left: x + w / 2 - w * 0.62,
+                top: y + h * 0.015,
+                width: w * 1.24,
+                height: h * 0.985,
+                borderRadius: `${w}px ${w}px ${h * 0.03}px ${h * 0.03}px`,
+                background: C.sun,
+                transform: `scaleY(${enter})`,
+                transformOrigin: "50% 100%",
+              }
+            : {
+                position: "absolute",
+                left: x + w / 2 - h * 0.36,
+                top: y + h * 0.1,
+                width: h * 0.72,
+                height: h * 0.72,
+                borderRadius: "50%",
+                background: C.sun,
+                transform: `scale(${enter})`,
+              }
+        }
       />
       <div
         style={{
@@ -742,7 +795,8 @@ function Narrator() {
   );
 }
 
-export function PortfolioStory() {
+export function PortfolioStory({ dark = false }: { dark?: boolean }) {
+  const C = dark ? DARK : LIGHT;
   const scenes: Record<string, React.FC<{ scene: Scene }>> = {
     intro: Intro,
     numbers: Numbers,
@@ -753,7 +807,8 @@ export function PortfolioStory() {
     cta: Cta,
   };
   return (
-    <AbsoluteFill style={{ fontFamily: TEXT }}>
+    <PaletteContext.Provider value={{ C, dark }}>
+      <AbsoluteFill style={{ fontFamily: TEXT }}>
       <Backdrop />
       {SCENES.map((s) => {
         const Comp = scenes[s.id];
@@ -765,6 +820,7 @@ export function PortfolioStory() {
       })}
       <TopBar />
       <Narrator />
-    </AbsoluteFill>
+      </AbsoluteFill>
+    </PaletteContext.Provider>
   );
 }

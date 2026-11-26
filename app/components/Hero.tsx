@@ -14,7 +14,7 @@ export default function Hero() {
   const { voice, toggleVoice } = useSound();
 
   return (
-    <section id="top" className="relative z-[2] px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
+    <section id="top" className="hero-glow relative z-[2] px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
       <div className="container-x grid items-stretch gap-10 lg:grid-cols-12 lg:gap-8">
         <div className="flex flex-col justify-between lg:col-span-7">
           <div>

@@ -5,6 +5,7 @@ import { Player, type PlayerRef } from "@remotion/player";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { PortfolioStory } from "../story/PortfolioStory";
 import { SCENES, STORY_DURATION, STORY_FPS } from "../story/content";
+import { useTheme } from "next-themes";
 import { useSound } from "./SoundProvider";
 
 /** Scroll position 0 maps to this frame: the intro is already on screen. */
@@ -28,6 +29,7 @@ export default function StorySection() {
   const [touring, setTouring] = useState(false);
   const [progress, setProgress] = useState(0);
   const { play, say, hush } = useSound();
+  const dark = useTheme().resolvedTheme === "dark";
   const touringRef = useRef(false);
   const [near, setNear] = useState(false);
 
@@ -177,6 +179,7 @@ export default function StorySection() {
       key={`${portrait}-${reduced}`}
       ref={playerRef}
       component={PortfolioStory}
+      inputProps={{ dark }}
       durationInFrames={STORY_DURATION}
       fps={STORY_FPS}
       compositionWidth={size.w}
@@ -210,7 +213,7 @@ export default function StorySection() {
         }
       >
         <div
-          className="relative w-full overflow-hidden rounded-[2rem] border-[1.5px] border-line-strong bg-[#f3f4f6]"
+          className="relative w-full overflow-hidden rounded-[2rem] border-[1.5px] border-line-strong bg-[#f3f4f6] dark:bg-[#0f1326]"
           style={{
             aspectRatio: `${size.w} / ${size.h}`,
             maxWidth: portrait

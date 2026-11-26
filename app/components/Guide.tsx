@@ -243,7 +243,7 @@ function GuideBody({
     <>
       {waving ? (
         <div className="relative shrink-0">
-          <div aria-hidden className="absolute left-1/2 top-[10%] aspect-square w-[130%] -translate-x-1/2 rounded-full bg-sun" />
+          <div aria-hidden className="absolute left-1/2 top-[10%] aspect-square w-[130%] -translate-x-1/2 rounded-full bg-sun dark:top-[2%] dark:aspect-auto dark:h-full dark:w-[112%] dark:rounded-b-2xl dark:rounded-t-full" />
           <Avatar pose={wavingPose(tick * 0.05)} t={tick * 0.05} height={narrow ? 150 : 210} />
         </div>
       ) : (
@@ -256,7 +256,7 @@ function GuideBody({
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ delay: 0.15, duration: 0.25 }}
         role="status"
-        className="pointer-events-auto relative mb-3 max-w-[min(64vw,320px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
+        className="pointer-events-auto relative mb-3 max-w-[min(calc(100vw-11.75rem),320px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
       >
         <span className="sr-only">{text}</span>
         <span aria-hidden>

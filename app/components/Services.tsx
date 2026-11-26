@@ -24,7 +24,7 @@ export default function Services() {
             <p className="mt-4 max-w-[46ch] text-lg">
               One price for the whole site. I keep revising it until you are happy with it.
             </p>
-            <ul className="mt-6 space-y-2 text-lg">
+            <ul className="mb-8 mt-6 space-y-2 text-lg">
               {sites.map((s) => (
                 <li key={s} className="flex items-start gap-3">
                   <Check size={20} strokeWidth={3} className="mt-1 shrink-0" aria-hidden />
@@ -36,14 +36,14 @@ export default function Services() {
               href={whatsappLink("Hi Ali, I'd like a website or store for $120. Here is what I need:")}
               target="_blank"
               rel="noreferrer"
-              className="btn mt-8 self-start bg-on-sun !px-6 !py-4 !text-lg text-white hover:bg-[#1c2a55] md:mt-auto md:translate-y-2"
+              className="btn mt-auto self-start !bg-on-sun !px-6 !py-4 !text-lg !text-white hover:!bg-[#1c2a55] md:mt-auto"
             >
               <MessageCircle size={20} aria-hidden />
               Order on WhatsApp
             </a>
           </article>
 
-          <article className="rise flex flex-col rounded-[2rem] bg-[#0f1a3a] p-7 text-white md:p-10">
+          <article className="rise flex flex-col rounded-[2rem] bg-[#0f1a3a] p-7 text-white dark:bg-raised dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(244,245,248,0.14)] md:p-10">
             <h3 className="display text-4xl md:text-5xl">AI agents and bots</h3>
             <p className="mt-6 flex items-baseline gap-3">
               <span className="display text-5xl md:text-6xl">Quoted per project</span>
@@ -52,7 +52,7 @@ export default function Services() {
               Tell me what the bot should do and where it should live. I send a price and a timeline before any
               work starts.
             </p>
-            <ul className="mt-6 space-y-2 text-lg">
+            <ul className="mb-8 mt-6 space-y-2 text-lg">
               {ai.map((s) => (
                 <li key={s} className="flex items-start gap-3">
                   <Check size={20} strokeWidth={3} className="mt-1 shrink-0 text-sun" aria-hidden />
@@ -64,7 +64,7 @@ export default function Services() {
               href={whatsappLink("Hi Ali, I'd like a quote for an AI agent or bot. Here is what it should do:")}
               target="_blank"
               rel="noreferrer"
-              className="btn mt-8 self-start bg-sun !px-6 !py-4 !text-lg text-on-sun hover:bg-[#ffd75e] md:mt-auto md:translate-y-2"
+              className="btn mt-auto self-start !bg-sun !px-6 !py-4 !text-lg !text-on-sun hover:!bg-[#ffd75e] md:mt-auto"
             >
               <MessageCircle size={20} aria-hidden />
               Ask for a quote on WhatsApp

@@ -47,7 +47,7 @@ export default function About() {
           </dl>
 
           <aside className="lg:col-span-4">
-            <div className="rounded-3xl bg-surface p-7">
+            <div className="raised rounded-3xl p-7">
               <p className="font-display text-2xl font-bold leading-tight tracking-tight">
                 Seven years, six companies, eleven shipped products, clients on four continents.
               </p>

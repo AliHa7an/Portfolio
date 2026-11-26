@@ -131,7 +131,7 @@ const projects: Project[] = [
 
 export default function Projects() {
   return (
-    <section id="projects" className="section bg-surface">
+    <section id="projects" className="section bg-surface dark:border-y dark:border-line">
       <div className="container-x">
         <SectionHeader
           title="Selected work"

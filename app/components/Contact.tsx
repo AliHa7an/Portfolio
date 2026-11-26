@@ -23,7 +23,7 @@ export default function Contact() {
           </p>
           <a
             href="mailto:alihexan@gmail.com"
-            className="btn mt-8 bg-on-sun text-white hover:bg-[#1c2a55] !px-6 !py-4 !text-lg"
+            className="btn mt-8 !bg-on-sun !text-white hover:!bg-[#1c2a55] !px-6 !py-4 !text-lg"
           >
             <Mail size={20} aria-hidden />
             alihexan@gmail.com
