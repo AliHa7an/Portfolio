@@ -3,8 +3,8 @@ import "./globals.css";
 import Providers from "./providers";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import CommandPalette from "./components/CommandPalette";
-import Guide from "./components/Guide";
+import WhatsAppButton from "./components/WhatsAppButton";
+import { LazyExtras } from "./components/Lazy";
 
 const title = "Ali Hassan, senior full stack and AI engineer";
 
@@ -36,9 +36,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Ali Hassan", url: "https://github.com/AliHa7an" }],
   creator: "Ali Hassan",
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    shortcut: "/icon.png",
-    apple: "/icon.png",
+    icon: [{ url: "/favicon-64.png", type: "image/png", sizes: "64x64" }],
+    apple: "/apple-icon-180.png",
   },
   openGraph: {
     title,
@@ -62,8 +61,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Navbar />
           <main>{children}</main>
           <Footer />
-          <Guide />
-          <CommandPalette />
+          <WhatsAppButton />
+          <LazyExtras />
         </Providers>
       </body>
     </html>

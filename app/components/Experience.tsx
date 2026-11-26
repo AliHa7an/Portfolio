@@ -95,7 +95,7 @@ export default function Experience() {
         />
         <ol>
           {jobs.map((j) => (
-            <li key={j.company + j.period} className="grid gap-x-8 gap-y-3 border-t border-line-strong py-8 md:grid-cols-12 md:py-10">
+            <li key={j.company + j.period} className="rise grid gap-x-8 gap-y-3 border-t border-line-strong py-8 md:grid-cols-12 md:py-10">
               <div className="md:col-span-4">
                 <p className="font-medium">{j.period.replace(" — ", " to ")}</p>
                 <p className="text-fg-soft">{j.location}</p>

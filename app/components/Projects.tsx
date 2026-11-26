@@ -165,9 +165,9 @@ export default function Projects() {
                 </p>
               </>
             );
-            const row = "group grid gap-x-8 gap-y-3 border-t border-line-strong py-7 md:grid-cols-12 md:py-9";
+            const row = "group grid transition-[padding] duration-200 hover:md:pl-3 gap-x-8 gap-y-3 border-t border-line-strong py-7 md:grid-cols-12 md:py-9";
             return (
-              <li key={p.title}>
+              <li key={p.title} className="rise">
                 {live ? (
                   <a href={p.url} target="_blank" rel="noreferrer" className={row}>
                     {body}

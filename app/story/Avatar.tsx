@@ -20,19 +20,16 @@ export const AVATAR_RATIO = 486 / 1004;
 
 export type AvatarProps = {
   pose: Pose;
-  /** Time in seconds; drives a gentle breathing sway. */
+  /** Time in seconds; drives a gentle sway. */
   t?: number;
   /** Rendered height in px (or any CSS length). */
   height: number | string;
-  /** Skip the outline and shadow, for use on a bright solid field. */
-  plain?: boolean;
   style?: React.CSSProperties;
   className?: string;
 };
 
-export function Avatar({ pose, t = 0, height, plain, style, className }: AvatarProps) {
+export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
   const sway = Math.sin(t * 1.5) * 0.6;
-  const breathe = 1 + Math.sin(t * 1.9) * 0.006;
   return (
     <div
       className={className}
@@ -41,18 +38,21 @@ export function Avatar({ pose, t = 0, height, plain, style, className }: AvatarP
         position: "relative",
         height,
         aspectRatio: "486 / 1004",
-        transform: `rotate(${sway}deg) scaleY(${breathe})`,
+        transform: sway ? `rotate(${sway}deg)` : undefined,
         transformOrigin: "50% 100%",
         ...style,
       }}
     >
       {(Object.keys(POSES) as Pose[]).map((p) => (
-        // Plain <img>: these are small local sprites that must swap instantly.
+        // Plain <img>: small local sprites that must swap instantly.
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={p}
-          src={`/avatar/pose-${POSES[p]}.png`}
+          src={`/avatar/pose-${POSES[p]}.webp`}
           alt=""
+          width={486}
+          height={1004}
+          decoding="async"
           draggable={false}
           style={{
             position: "absolute",
@@ -60,10 +60,7 @@ export function Avatar({ pose, t = 0, height, plain, style, className }: AvatarP
             width: "100%",
             height: "100%",
             objectFit: "contain",
-            opacity: p === pose ? 1 : 0,
-            filter: plain
-              ? undefined
-              : "drop-shadow(0 0 1px rgba(255,255,255,0.7)) drop-shadow(0 10px 14px rgba(15,26,58,0.22))",
+            visibility: p === pose ? "visible" : "hidden",
             userSelect: "none",
           }}
         />
