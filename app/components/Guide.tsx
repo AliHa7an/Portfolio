@@ -4,9 +4,10 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Avatar, wavingPose } from "../story/Avatar";
-import { TalkingHead, mouthFor } from "../story/TalkingHead";
+import { TalkingHead, mouthFor, mouthOf } from "../story/TalkingHead";
+import { speech } from "../story/speech";
 import { GUIDE_LINES, SKILL_GROUPS } from "../story/content";
-import { useSound } from "./SoundProvider";
+import { useSound, useSpeech } from "./SoundProvider";
 
 const STORE_KEY = "guide-hidden";
 const listeners = new Set<() => void>();
@@ -161,28 +162,16 @@ function GuideBody({
   const [frame, setFrame] = useState({ tick: 0, pos: 0, done: false });
   const [tucked, setTucked] = useState(quiet);
   // Live values for the clock; the render only ever reads `frame`.
-  const live = useRef({ tick: 0, pos: 0, voiced: false, spoken: false, doneAt: -1, finished: false });
+  const live = useRef({ tick: 0, pos: 0, voiced: false, heard: false, spoken: false, doneAt: -1, finished: false });
   const started = useRef(false);
   const { say, hush } = useSound();
+  const voiceNow = useSpeech();
 
   const start = useCallback(
     (force: boolean) => {
       const l = live.current;
-      l.tick = 0;
-      l.pos = 0;
-      l.spoken = false;
-      l.doneAt = -1;
-      l.finished = false;
-      l.voiced = say(text, {
-        force,
-        // Follow the real speech when the browser reports word boundaries.
-        onBoundary: (i) => {
-          l.pos = i;
-        },
-        onEnd: () => {
-          l.spoken = true;
-        },
-      });
+      Object.assign(l, { tick: 0, pos: 0, heard: false, spoken: false, doneAt: -1, finished: false });
+      l.voiced = say(text, { force });
     },
     [say, text]
   );
@@ -193,25 +182,38 @@ function GuideBody({
     start(line.asked);
   }, [start, quiet, line.asked]);
 
-  // One clock drives the caption, his lips, the wave and the hand-off to the next line.
+  // One clock drives the caption, the wave and the hand-off to the next line.
   useEffect(() => {
     if (tucked) return;
     const id = window.setInterval(() => {
       const l = live.current;
+      const v = speech.get();
+      const mine = v.text === text;
       l.tick += 1;
-      l.pos = Math.min(text.length, l.pos + 0.8);
-      // Finished when the voice ends, or when the caption has run if there is
-      // no voice. The timeout covers browsers that never report the end.
-      const done = l.voiced ? l.spoken || l.tick > 30 + text.length * 2.2 : l.pos >= text.length;
+      if (mine && v.active) {
+        // Follow the real voice.
+        l.heard = true;
+        l.pos = v.pos;
+      } else if (l.heard) {
+        l.spoken = true;
+        l.pos = text.length;
+      } else {
+        // No voice (muted, or waiting for the first tap): the caption types itself.
+        l.pos = Math.min(text.length, l.pos + 0.8);
+      }
+      // Finished when the voice ends, or when the caption has run if nothing
+      // was heard. The timeout covers a voice that never starts.
+      const waited = l.tick > 40 + text.length * 2;
+      const done = l.voiced ? l.spoken || (waited && !l.heard) || l.tick > 80 + text.length * 3 : l.pos >= text.length;
       if (done && l.doneAt < 0) l.doneAt = l.tick;
-      if (done && !l.finished && l.tick - l.doneAt >= 24) {
+      if (done && !l.finished && l.tick - l.doneAt >= 20) {
         l.finished = true;
         if (!onDone(line)) setTucked(true);
       }
       setFrame({ tick: l.tick, pos: l.pos, done });
     }, 50);
     return () => window.clearInterval(id);
-  }, [tucked, text.length, onDone, line]);
+  }, [tucked, text, onDone, line]);
 
   const { tick, pos, done } = frame;
   const head = narrow ? 76 : 104;
@@ -236,7 +238,12 @@ function GuideBody({
 
   const talking = !done && pos > 0;
   const shown = done ? text.length : Math.min(text.length, Math.ceil(pos));
-  const mouth = talking ? mouthFor(text[Math.min(text.length - 1, Math.floor(pos))]) : "smile";
+  const speakingThis = voiceNow.active && voiceNow.text === text;
+  const mouth = speakingThis
+    ? mouthOf(voiceNow)
+    : talking
+      ? mouthFor(text[Math.min(text.length - 1, Math.floor(pos))])
+      : "smile";
   const waving = line.wave && !reduce && tick < 22;
 
   return (
@@ -248,7 +255,7 @@ function GuideBody({
         </div>
       ) : (
         <div className="shrink-0 overflow-hidden rounded-full border-[4px] border-sun shadow-[0_8px_0_rgba(15,26,58,0.18)]">
-          <TalkingHead mouth={mouth} size={head} />
+          <TalkingHead mouth={mouth} size={head} energy={speakingThis ? voiceNow.level : 0} />
         </div>
       )}
       <motion.div

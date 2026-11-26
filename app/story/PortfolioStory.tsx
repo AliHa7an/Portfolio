@@ -11,7 +11,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { AVATAR_RATIO, Avatar, talkingPose, wavingPose, type Pose } from "./Avatar";
-import { TalkingHead, mouthFor } from "./TalkingHead";
+import { TalkingHead, mouthFor, type Mouth } from "./TalkingHead";
 import {
   AI_PILLARS,
   JOURNEY,
@@ -57,7 +57,10 @@ const DARK: Palette = {
   onSun: "#0f1a3a",
 };
 
-const PaletteContext = React.createContext<{ C: Palette; dark: boolean }>({ C: LIGHT, dark: false });
+/** His real voice, when it is playing: the mouth shape and loudness right now. */
+type Live = { mouth: Mouth; level: number } | null;
+
+const PaletteContext = React.createContext<{ C: Palette; dark: boolean; live: Live }>({ C: LIGHT, dark: false, live: null });
 const usePalette = () => React.useContext(PaletteContext).C;
 
 const DISPLAY = "var(--font-display), system-ui, sans-serif";
@@ -676,7 +679,7 @@ function TopBar() {
 
 /** The avatar and its speech bubble, visible across every scene. */
 function Narrator() {
-  const { C, dark } = React.useContext(PaletteContext);
+  const { C, dark, live } = React.useContext(PaletteContext);
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const { pick, portrait } = useLayout();
@@ -714,6 +717,14 @@ function Narrator() {
   } else if (talking) {
     pose = talkingPose(local / fps);
   }
+
+  // Lips: the live voice when it is playing, otherwise the caption being typed.
+  const mouth: Mouth | undefined = live
+    ? live.mouth
+    : talking
+      ? mouthFor(scene.line[Math.max(0, chars - 1)])
+      : undefined;
+  if (live && pose === "idle") pose = talkingPose(t);
 
   const bubbleLeft = pick(236, smallX + smallH * AVATAR_RATIO + 12);
 
@@ -755,7 +766,7 @@ function Narrator() {
           transform: `translateY(${(1 - enter) * 40}px)`,
         }}
       >
-        <Avatar pose={pose} t={t} height={h} />
+        <Avatar pose={pose} t={t} height={h} mouth={mouth} />
       </div>
 
       <div
@@ -782,7 +793,8 @@ function Narrator() {
         }}
       >
         <TalkingHead
-          mouth={talking ? mouthFor(scene.line[Math.max(0, chars - 1)]) : "smile"}
+          mouth={mouth ?? "smile"}
+          energy={live?.level ?? 0}
           size={pick(88, 84)}
           style={{ border: `4px solid ${C.sun}` }}
         />
@@ -795,7 +807,7 @@ function Narrator() {
   );
 }
 
-export function PortfolioStory({ dark = false }: { dark?: boolean }) {
+export function PortfolioStory({ dark = false, live = null }: { dark?: boolean; live?: Live }) {
   const C = dark ? DARK : LIGHT;
   const scenes: Record<string, React.FC<{ scene: Scene }>> = {
     intro: Intro,
@@ -807,7 +819,7 @@ export function PortfolioStory({ dark = false }: { dark?: boolean }) {
     cta: Cta,
   };
   return (
-    <PaletteContext.Provider value={{ C, dark }}>
+    <PaletteContext.Provider value={{ C, dark, live }}>
       <AbsoluteFill style={{ fontFamily: TEXT }}>
       <Backdrop />
       {SCENES.map((s) => {

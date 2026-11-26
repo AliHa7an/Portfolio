@@ -6,7 +6,8 @@ import { Pause, Play, RotateCcw } from "lucide-react";
 import { PortfolioStory } from "../story/PortfolioStory";
 import { SCENES, STORY_DURATION, STORY_FPS } from "../story/content";
 import { useTheme } from "next-themes";
-import { useSound } from "./SoundProvider";
+import { useSound, useSpeech } from "./SoundProvider";
+import { mouthOf } from "../story/TalkingHead";
 
 /** Scroll position 0 maps to this frame: the intro is already on screen. */
 const FIRST_FRAME = 50;
@@ -30,6 +31,8 @@ export default function StorySection() {
   const [progress, setProgress] = useState(0);
   const { play, say, hush } = useSound();
   const dark = useTheme().resolvedTheme === "dark";
+  const voiceNow = useSpeech();
+  const live = voiceNow.active ? { mouth: mouthOf(voiceNow, "closed"), level: voiceNow.level } : null;
   const touringRef = useRef(false);
   const [near, setNear] = useState(false);
 
@@ -179,7 +182,7 @@ export default function StorySection() {
       key={`${portrait}-${reduced}`}
       ref={playerRef}
       component={PortfolioStory}
-      inputProps={{ dark }}
+      inputProps={{ dark, live }}
       durationInFrames={STORY_DURATION}
       fps={STORY_FPS}
       compositionWidth={size.w}

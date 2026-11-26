@@ -12,23 +12,20 @@ import {
 } from "react";
 import { Music, Volume2, VolumeX } from "lucide-react";
 import { HERO_INTRO } from "../story/content";
+import { speak, speech, stopSpeech, unlockAudio } from "../story/speech";
 
 type SoundName = "hover" | "click" | "chime" | "whoosh";
 
 export type SayOptions = {
   /** Speak even if voice is off: the visitor pressed a Listen button. */
   force?: boolean;
-  /** Called as each word starts, with its character index (not in every browser). */
-  onBoundary?: (charIndex: number) => void;
-  /** Called when the line has been spoken in full. */
-  onEnd?: () => void;
 };
 
 type SoundApi = {
   /** His voice. On by default; starts at the visitor's first click, tap or key press. */
   voice: boolean;
   toggleVoice: () => void;
-  /** Background music and interface sounds. Off by default. */
+  /** Soft background music and interface sounds. On by default, kept under the voice. */
   music: boolean;
   toggleMusic: () => void;
   play: (name: SoundName) => void;
@@ -40,7 +37,7 @@ type SoundApi = {
 const SoundContext = createContext<SoundApi>({
   voice: true,
   toggleVoice: () => {},
-  music: false,
+  music: true,
   toggleMusic: () => {},
   play: () => {},
   say: () => false,
@@ -49,49 +46,38 @@ const SoundContext = createContext<SoundApi>({
 
 export const useSound = () => useContext(SoundContext);
 
-/* ─── Voice preference, remembered across visits ─────────────── */
+/** Live state of his voice: what he is saying, how far in, how loud. */
+export const useSpeech = () => useSyncExternalStore(speech.subscribe, speech.get, speech.server);
 
-const VOICE_KEY = "voice-off";
-const voiceListeners = new Set<() => void>();
-const voicePref = {
-  subscribe(cb: () => void) {
-    voiceListeners.add(cb);
-    return () => voiceListeners.delete(cb);
-  },
-  get() {
-    try {
-      return window.localStorage.getItem(VOICE_KEY) !== "1";
-    } catch {
-      return true;
-    }
-  },
-  set(on: boolean) {
-    try {
-      window.localStorage.setItem(VOICE_KEY, on ? "0" : "1");
-    } catch {
-      // Storage blocked: the choice lasts for this visit only.
-    }
-    voiceListeners.forEach((l) => l());
-  },
-};
+/* ─── On/off choices, remembered across visits ───────────────── */
 
-/** Best available English voice, preferring a natural male one. */
-function pickVoice(): SpeechSynthesisVoice | null {
-  const english = window.speechSynthesis.getVoices().filter((v) => /^en[-_]/i.test(v.lang));
-  const wanted = [
-    /Microsoft (Andrew|Brian|Guy|Ryan|Davis|Christopher).*(Natural|Online)/i,
-    /Google UK English Male/i,
-    /\b(Daniel|Arthur|Oliver|Aaron|Evan)\b/i,
-    /Microsoft (Guy|Ryan|David|Mark|George)/i,
-    /\bMale\b/i,
-    /Google US English/i,
-  ];
-  for (const re of wanted) {
-    const v = english.find((voice) => re.test(voice.name));
-    if (v) return v;
-  }
-  return english[0] ?? null;
+function makePref(key: string) {
+  const listeners = new Set<() => void>();
+  return {
+    subscribe(cb: () => void) {
+      listeners.add(cb);
+      return () => listeners.delete(cb);
+    },
+    get() {
+      try {
+        return window.localStorage.getItem(key) !== "1";
+      } catch {
+        return true;
+      }
+    },
+    set(on: boolean) {
+      try {
+        window.localStorage.setItem(key, on ? "0" : "1");
+      } catch {
+        // Storage blocked: the choice lasts for this visit only.
+      }
+      listeners.forEach((l) => l());
+    },
+  };
 }
+
+const voicePref = makePref("voice-off");
+const musicPref = makePref("music-off");
 
 /* ─── Music and interface sounds (Tone.js, generated in code) ── */
 
@@ -102,6 +88,10 @@ type Engine = {
   /** Lower the music while he is speaking. */
   duck: (down: boolean) => void;
 };
+
+/** Music sits well under the voice, and drops further while he speaks. */
+const LEVEL = 0.34;
+const DUCKED = 0.08;
 
 async function createEngine(): Promise<Engine> {
   const Tone = await import("tone");
@@ -192,13 +182,13 @@ async function createEngine(): Promise<Engine> {
       }
     },
     duck(down) {
-      master.gain.rampTo(down ? 0.22 : 0.9, 0.35);
+      master.gain.rampTo(down ? DUCKED : LEVEL, 0.4);
     },
     start() {
       chordLoop.start(0);
       bellLoop.start("1m");
       transport.start();
-      master.gain.rampTo(0.9, 1.2);
+      master.gain.rampTo(LEVEL, 2);
     },
     stop() {
       master.gain.rampTo(0, 0.5);
@@ -216,84 +206,88 @@ async function createEngine(): Promise<Engine> {
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
   const voice = useSyncExternalStore(voicePref.subscribe, voicePref.get, () => true);
-  const [music, setMusic] = useState(false);
+  const music = useSyncExternalStore(musicPref.subscribe, musicPref.get, () => true);
+  const [playing, setPlaying] = useState(false);
   const engine = useRef<Engine | null>(null);
   const loading = useRef(false);
-  /** Browsers refuse to speak until the visitor has clicked, tapped or typed. */
+  /** Browsers refuse to make sound until the visitor has clicked, tapped or typed. */
   const unlocked = useRef(false);
-  const pending = useRef<{ text: string; options?: SayOptions } | null>(null);
-  const current = useRef(0);
+  const pending = useRef<string | null>(null);
 
   const hush = useCallback(() => {
-    current.current += 1;
     pending.current = null;
-    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    engine.current?.duck(false);
-  }, []);
-
-  const speakNow = useCallback((text: string, options?: SayOptions) => {
-    if (!("speechSynthesis" in window)) return false;
-    const synth = window.speechSynthesis;
-    const id = (current.current += 1);
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    const v = pickVoice();
-    if (v) u.voice = v;
-    u.lang = v?.lang ?? "en-US";
-    u.rate = 1.02;
-    u.pitch = 0.92;
-    u.onstart = () => engine.current?.duck(true);
-    u.onboundary = (e) => {
-      if (id === current.current) options?.onBoundary?.(e.charIndex);
-    };
-    u.onend = () => {
-      if (id !== current.current) return;
-      engine.current?.duck(false);
-      options?.onEnd?.();
-    };
-    u.onerror = () => {
-      if (id === current.current) engine.current?.duck(false);
-    };
-    synth.speak(u);
-    return true;
+    stopSpeech();
   }, []);
 
   const say = useCallback(
     (text: string, options?: SayOptions) => {
       if (!voice && !options?.force) return false;
-      if (!("speechSynthesis" in window)) return false;
       if (!unlocked.current && !options?.force) {
         // Keep the latest line; it is spoken at the first click or tap.
-        pending.current = { text, options };
+        pending.current = text;
         return true;
       }
       unlocked.current = true;
-      return speakNow(text, options);
+      return speak(text);
     },
-    [voice, speakNow]
+    [voice]
   );
 
-  // First click, tap or key press anywhere: that gesture lets the browser speak.
+  const startMusic = useCallback(() => {
+    if (loading.current || engine.current) {
+      engine.current?.start();
+      setPlaying(true);
+      return;
+    }
+    loading.current = true;
+    createEngine()
+      .then((e) => {
+        engine.current = e;
+        e.start();
+        e.duck(speech.get().active);
+        setPlaying(true);
+      })
+      .catch(() => setPlaying(false))
+      .finally(() => {
+        loading.current = false;
+      });
+  }, []);
+
+  // First click, tap or key press anywhere: that gesture lets the browser make sound.
   useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.getVoices();
     const unlock = () => {
       if (unlocked.current) return;
       unlocked.current = true;
-      if (!voicePref.get()) return;
-      const waiting = pending.current;
-      pending.current = null;
-      if (waiting) speakNow(waiting.text, waiting.options);
-      else if (window.scrollY < window.innerHeight * 0.6) speakNow(HERO_INTRO);
+      unlockAudio();
+      if (voicePref.get()) {
+        const waiting = pending.current;
+        pending.current = null;
+        if (waiting) speak(waiting);
+        else if (window.scrollY < window.innerHeight * 0.6) speak(HERO_INTRO);
+      }
+      if (musicPref.get()) startMusic();
     };
     window.addEventListener("pointerdown", unlock, true);
     window.addEventListener("keydown", unlock, true);
     return () => {
       window.removeEventListener("pointerdown", unlock, true);
       window.removeEventListener("keydown", unlock, true);
-      window.speechSynthesis.cancel();
+      stopSpeech();
     };
-  }, [speakNow]);
+  }, [startMusic]);
+
+  // The music steps back whenever he speaks.
+  useEffect(() => {
+    let was = false;
+    const stop = speech.subscribe(() => {
+      const now = speech.get().active;
+      if (now !== was) engine.current?.duck(now);
+      was = now;
+    });
+    return () => {
+      stop();
+    };
+  }, []);
 
   const toggleVoice = useCallback(() => {
     if (voice) {
@@ -302,47 +296,38 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     } else {
       voicePref.set(true);
       unlocked.current = true;
-      speakNow("My voice is on. Scroll and I will talk you through my work.");
+      speak("My voice is on. Scroll and I will talk you through my work.");
     }
-  }, [voice, hush, speakNow]);
+  }, [voice, hush]);
 
   const toggleMusic = useCallback(() => {
-    if (loading.current) return;
     if (music) {
+      musicPref.set(false);
       engine.current?.stop();
-      setMusic(false);
-      return;
+      setPlaying(false);
+    } else {
+      musicPref.set(true);
+      unlocked.current = true;
+      startMusic();
     }
-    loading.current = true;
-    (engine.current ? Promise.resolve(engine.current) : createEngine())
-      .then((e) => {
-        engine.current = e;
-        e.start();
-        e.duck(window.speechSynthesis?.speaking ?? false);
-        setMusic(true);
-      })
-      .catch(() => setMusic(false))
-      .finally(() => {
-        loading.current = false;
-      });
-  }, [music]);
+  }, [music, startMusic]);
 
   const play = useCallback(
     (name: SoundName) => {
-      if (music) engine.current?.play(name);
+      if (playing) engine.current?.play(name);
     },
-    [music]
+    [playing]
   );
 
   // Interface sounds for every link and button, without touching each component.
   useEffect(() => {
-    if (!music) return;
+    if (!playing) return;
     const selector = "a, button";
     let last: Element | null = null;
     const over = (e: PointerEvent) => {
-      const el = (e.target as Element | null)?.closest?.(selector) ?? null;
-      if (el && el !== last) engine.current?.play("hover");
-      last = el;
+      const target = (e.target as Element | null)?.closest?.(selector) ?? null;
+      if (target && target !== last) engine.current?.play("hover");
+      last = target;
     };
     const down = (e: PointerEvent) => {
       if ((e.target as Element | null)?.closest?.(selector)) engine.current?.play("click");
@@ -353,19 +338,19 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
       document.removeEventListener("pointerover", over);
       document.removeEventListener("pointerdown", down);
     };
-  }, [music]);
+  }, [playing]);
 
   // Never keep playing or talking in a background tab.
   useEffect(() => {
     const vis = () => {
       if (document.hidden) {
         hush();
-        if (music) engine.current?.stop();
-      } else if (music) engine.current?.start();
+        if (playing) engine.current?.stop();
+      } else if (playing) engine.current?.start();
     };
     document.addEventListener("visibilitychange", vis);
     return () => document.removeEventListener("visibilitychange", vis);
-  }, [music, hush]);
+  }, [playing, hush]);
 
   const value = useMemo(
     () => ({ voice, toggleVoice, music, toggleMusic, play, say, hush }),
@@ -395,18 +380,19 @@ export function SoundToggle() {
         type="button"
         onClick={toggleMusic}
         aria-pressed={music}
-        aria-label={music ? "Turn music off" : "Turn music on"}
-        className={`${pill} !px-0 w-10 justify-center ${music ? "bg-sun text-on-sun !border-on-sun" : ""}`}
+        aria-label={music ? "Turn background music off" : "Turn background music on"}
+        className={pill}
       >
         {music ? (
-          <span className="flex h-4 items-end gap-[3px]" aria-hidden>
+          <span className="flex h-4 w-[17px] items-end justify-center gap-[3px]" aria-hidden>
             {[0, 1, 2].map((i) => (
-              <span key={i} className="eq-bar w-[3px] rounded-full bg-on-sun" style={{ animationDelay: `${i * 0.13}s` }} />
+              <span key={i} className="eq-bar w-[3px] rounded-full bg-fg" style={{ animationDelay: `${i * 0.13}s` }} />
             ))}
           </span>
         ) : (
-          <Music size={17} aria-hidden />
+          <Music size={17} className="opacity-50" aria-hidden />
         )}
+        <span className="hidden xl:inline">{music ? "Music on" : "Music off"}</span>
       </button>
     </>
   );

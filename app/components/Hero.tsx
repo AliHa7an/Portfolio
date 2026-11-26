@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { Play, Volume2, VolumeX } from "lucide-react";
-import { useSound } from "./SoundProvider";
+import { useSound, useSpeech } from "./SoundProvider";
+import { MouthPatch, mouthOf } from "../story/TalkingHead";
 
 const facts = [
   { term: "Now", detail: "Full stack developer at FourthD Inc." },
@@ -12,6 +13,7 @@ const facts = [
 
 export default function Hero() {
   const { voice, toggleVoice } = useSound();
+  const speaking = useSpeech();
 
   return (
     <section id="top" className="hero-glow relative z-[2] px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
@@ -65,16 +67,34 @@ export default function Hero() {
                 {voice ? "Mute my voice" : "Turn my voice on"}
               </button>
             </div>
-            <Image
-              src="/avatar/hero.webp"
-              alt="Ali Hassan's avatar, standing in a charcoal suit and navy tie"
-              width={422}
-              height={1402}
-              priority
-              sizes="(min-width: 1024px) 420px, 320px"
-              className="hero-figure absolute left-1/2 top-[19%] h-[165%] w-auto max-w-none -translate-x-1/2 select-none"
-              draggable={false}
-            />
+            <div
+              className="hero-figure absolute left-1/2 top-[19%] h-[165%] -translate-x-1/2"
+              style={{ aspectRatio: "422 / 1402" }}
+            >
+              {/* A slight lean with his own voice keeps him from standing like a photo. */}
+              <div
+                className="relative h-full w-full origin-[50%_60%] transition-transform duration-100 ease-out"
+                style={{
+                  transform: speaking.active
+                    ? `rotate(${(speaking.level - 0.4) * 0.5}deg) translateY(${speaking.level * 2}px)`
+                    : undefined,
+                }}
+              >
+                <Image
+                  src="/avatar/hero.webp"
+                  alt="Ali Hassan's avatar, standing in a charcoal suit and navy tie"
+                  width={422}
+                  height={1402}
+                  priority
+                  sizes="(min-width: 1024px) 420px, 320px"
+                  className="h-full w-full select-none"
+                  draggable={false}
+                />
+                {speaking.active && mouthOf(speaking, "closed") !== "closed" && (
+                  <MouthPatch which="hero" mouth={mouthOf(speaking, "closed")} />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

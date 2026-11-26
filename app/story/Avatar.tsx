@@ -1,4 +1,5 @@
 import React from "react";
+import { MOUTH_PATCH, MouthPatch, type Mouth } from "./TalkingHead";
 
 /**
  * Ali's avatar. Five poses, cut from his high-resolution pose sheet and
@@ -22,13 +23,16 @@ export type AvatarProps = {
   pose: Pose;
   /** Time in seconds; drives a gentle sway. */
   t?: number;
+  /** Mouth shape, for the poses in which he faces the viewer. */
+  mouth?: Mouth;
   /** Rendered height in px (or any CSS length). */
   height: number | string;
   style?: React.CSSProperties;
   className?: string;
 };
 
-export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
+export function Avatar({ pose, t = 0, mouth, height, style, className }: AvatarProps) {
+  const idx = POSES[pose];
   const sway = Math.sin(t * 1.5) * 0.6;
   return (
     <div
@@ -65,6 +69,9 @@ export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
           }}
         />
       ))}
+      {mouth && mouth !== "closed" && idx in MOUTH_PATCH && (
+        <MouthPatch which={idx as keyof typeof MOUTH_PATCH} mouth={mouth} />
+      )}
     </div>
   );
 }
