@@ -11,7 +11,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { AVATAR_RATIO, Avatar, talkingPose, wavingPose, type Pose } from "./Avatar";
-import { TalkingHead, mouthFor, type Mouth } from "./TalkingHead";
+import { mouthFor, type Mouth } from "./TalkingHead";
 import {
   AI_PILLARS,
   JOURNEY,
@@ -92,7 +92,7 @@ function SceneShell({ scene, wide, children }: { scene: Scene; wide?: boolean; c
       style={{
         opacity: inP * outP,
         transform: `translateY(${(1 - inP) * 30 - (1 - outP) * 30}px)`,
-        padding: pick(wide ? "96px 72px 176px" : "96px 72px 176px 236px", "118px 40px 268px"),
+        padding: pick(wide ? "96px 72px 176px" : "96px 72px 176px 262px", "118px 40px 268px"),
         display: "flex",
         flexDirection: "column",
         justifyContent: pick("center", wide ? "center" : "flex-start"),
@@ -698,7 +698,7 @@ function Narrator() {
   // Centre-stage for the intro, then steps back into the corner.
   const settle = interpolate(frame, [118, 150], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   const bigH = pick(500, 330);
-  const smallH = pick(330, 232);
+  const smallH = pick(410, 270);
   const h = interpolate(settle, [0, 1], [bigH, smallH]);
   const w = h * AVATAR_RATIO;
   const bigX = portrait ? (width - bigH * AVATAR_RATIO) / 2 : 150;
@@ -726,7 +726,7 @@ function Narrator() {
       : undefined;
   if (live && pose === "idle") pose = talkingPose(t);
 
-  const bubbleLeft = pick(236, smallX + smallH * AVATAR_RATIO + 12);
+  const bubbleLeft = pick(262, smallX + smallH * AVATAR_RATIO + 10);
 
   return (
     <>
@@ -775,11 +775,10 @@ function Narrator() {
           left: bubbleLeft,
           right: pick(72, 24),
           bottom: pick(40, 44),
-          minHeight: pick(116, 150),
+          minHeight: pick(104, 150),
           display: "flex",
           alignItems: "center",
-          gap: pick(20, 14),
-          padding: pick("14px 28px 14px 14px", "14px 18px 14px 12px"),
+          padding: pick("18px 28px", "16px 20px"),
           borderRadius: 26,
           borderBottomLeftRadius: 6,
           border: `2px solid ${C.fg}`,
@@ -792,12 +791,6 @@ function Narrator() {
           transform: `translateY(${(1 - bubbleIn) * 14}px)`,
         }}
       >
-        <TalkingHead
-          mouth={mouth ?? "smile"}
-          energy={live?.level ?? 0}
-          size={pick(88, 84)}
-          style={{ border: `4px solid ${C.sun}` }}
-        />
         <span>
           {scene.line.slice(0, chars)}
           <span style={{ opacity: talking && frame % 16 < 8 ? 1 : 0 }}>▍</span>

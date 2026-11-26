@@ -1,4 +1,4 @@
-import { Check, MessageCircle } from "lucide-react";
+import { Check, MessageCircle, PhoneCall } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import { whatsappLink } from "../story/content";
 
@@ -11,7 +11,7 @@ export default function Services() {
       <div className="container-x">
         <SectionHeader
           title="Need something built? Hire me directly."
-          description="Two things I take on as fixed projects, outside my full-time work. Message me on WhatsApp and I reply the same day."
+          description="Three ways to work with me outside my full-time job. Message me on WhatsApp and I reply the same day."
         />
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -71,6 +71,31 @@ export default function Services() {
             </a>
           </article>
         </div>
+
+        <article className="rise raised mt-6 grid gap-x-10 gap-y-6 rounded-[2rem] p-7 md:p-10 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-7">
+            <h3 className="display text-4xl md:text-5xl">Talk a problem through with me</h3>
+            <p className="mt-4 max-w-[58ch] text-lg text-fg-soft">
+              A call about your application&apos;s architecture and design, a development decision you are stuck
+              on, or how to approach a hard problem. Book as many ten-minute blocks as you need.
+            </p>
+          </div>
+          <div className="lg:col-span-5 lg:justify-self-end">
+            <p className="flex items-baseline gap-3">
+              <span className="display text-7xl md:text-8xl">$5</span>
+              <span className="text-lg font-medium">per 10 minutes</span>
+            </p>
+            <a
+              href={whatsappLink("Hi Ali, I'd like to book a consultation call ($5 per 10 minutes). The topic is:")}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary mt-5 !px-6 !py-4 !text-lg"
+            >
+              <PhoneCall size={20} aria-hidden />
+              Book a call on WhatsApp
+            </a>
+          </div>
+        </article>
       </div>
     </section>
   );

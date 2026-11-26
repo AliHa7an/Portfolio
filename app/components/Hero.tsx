@@ -8,7 +8,7 @@ import { MouthPatch, mouthOf } from "../story/TalkingHead";
 const facts = [
   { term: "Now", detail: "Full stack developer at FourthD Inc." },
   { term: "Based in", detail: "Pakistan, working remotely with teams abroad." },
-  { term: "Open to", detail: "Senior roles, and direct projects from $120." },
+  { term: "Open to", detail: "Senior roles, direct projects, and paid consultation calls." },
 ];
 
 export default function Hero() {

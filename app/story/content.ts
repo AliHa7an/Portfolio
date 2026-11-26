@@ -126,7 +126,7 @@ export const SHIPPED = [
 export const GUIDE_LINES: Record<string, string> = {
   about: "This is how I work: end to end, from system design to the cloud it runs on.",
   skills: "This is my toolkit. Let me take you through it.",
-  services: "You can hire me directly. Websites and stores are a fixed 120 dollars, and I quote AI agents and bots per project.",
+  services: "You can hire me directly. Websites and stores are a fixed 120 dollars, AI agents and bots are quoted per project, and a consultation call is 5 dollars for 10 minutes.",
   experience: "Six companies since 2018. Each entry shows what I owned and the stack I used.",
   projects: "Real products with real users. The ones with a live link open in a new tab.",
   contact: "That's me. If you have a role or a product in mind, write to me, or message me on WhatsApp.",

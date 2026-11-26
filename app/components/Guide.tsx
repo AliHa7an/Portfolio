@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { Avatar, wavingPose } from "../story/Avatar";
-import { TalkingHead, mouthFor, mouthOf } from "../story/TalkingHead";
+import { Avatar, talkingPose, wavingPose, type Pose } from "../story/Avatar";
+import { mouthFor, mouthOf, type Mouth } from "../story/TalkingHead";
 import { speech } from "../story/speech";
 import { GUIDE_LINES, SKILL_GROUPS } from "../story/content";
 import { useSound, useSpeech } from "./SoundProvider";
@@ -49,9 +49,9 @@ const markRow = (label: string | null) =>
   window.dispatchEvent(new CustomEvent("guide:row", { detail: { label } }));
 
 /**
- * Ali walks the page with the visitor. At each section he waves, then a
- * close-up of his face says the line with moving lips. In the skills section
- * he goes on to talk through every row.
+ * Ali walks the page with the visitor. At each section he steps in from the
+ * corner, waves, and says the line himself: lips, gestures and a slight lean
+ * all follow his voice. In the skills section he goes on through every row.
  */
 export default function Guide() {
   const [line, setLine] = useState<Line | null>(null);
@@ -59,9 +59,9 @@ export default function Guide() {
   const hidden = useSyncExternalStore(hiddenStore.subscribe, hiddenStore.get, () => false);
   const { voice } = useSound();
 
-  // Load the mouth shapes before he first speaks.
+  // Load his mouth shapes before he first speaks.
   useEffect(() => {
-    new Image().src = "/avatar/mouths.webp";
+    for (const n of [0, 3, 4]) new Image().src = `/avatar/mouth-${n}.webp`;
   }, []);
 
   // Which section is on screen. Stays away over the hero and the story stage.
@@ -134,7 +134,7 @@ export default function Guide() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-none fixed bottom-4 left-3 z-40 flex items-end gap-3 md:left-6"
+          className="pointer-events-none fixed bottom-0 left-2 z-40 flex items-end gap-2 md:left-5 md:gap-3"
         >
           <GuideBody key={line.key} line={line} quiet={hidden && !line.asked} onQuiet={hiddenStore.set} onDone={next} />
         </motion.div>
@@ -216,7 +216,10 @@ function GuideBody({
   }, [tucked, text, onDone, line]);
 
   const { tick, pos, done } = frame;
-  const head = narrow ? 76 : 104;
+  // He is shown from the waist up, large enough for his face to read.
+  const figure = narrow ? 400 : 560;
+  const frameW = narrow ? 150 : 204;
+  const frameH = narrow ? 190 : 262;
 
   if (tucked) {
     return (
@@ -229,41 +232,52 @@ function GuideBody({
           start(true);
         }}
         aria-label="Hear Ali on this section"
-        className="pointer-events-auto overflow-hidden rounded-full border-[3px] border-sun shadow-[0_6px_0_rgba(15,26,58,0.18)]"
+        className="pointer-events-auto h-16 w-16 overflow-hidden rounded-full border-[3px] border-fg bg-sun shadow-[0_6px_0_rgba(15,26,58,0.18)] transition-transform duration-150 ease-out hover:-translate-y-0.5 active:scale-95"
       >
-        <TalkingHead mouth="smile" size={narrow ? 56 : 68} />
+        <span className="flex justify-center pt-1">
+          <Avatar pose="idle" height={230} />
+        </span>
       </button>
     );
   }
 
+  const t = tick * 0.05;
   const talking = !done && pos > 0;
   const shown = done ? text.length : Math.min(text.length, Math.ceil(pos));
   const speakingThis = voiceNow.active && voiceNow.text === text;
-  const mouth = speakingThis
-    ? mouthOf(voiceNow)
+  const waving = line.wave && !reduce && tick < 22;
+
+  let pose: Pose = "idle";
+  if (waving) pose = wavingPose(t);
+  else if (speakingThis || talking) pose = talkingPose(t);
+
+  // Lips: the real voice when it is playing, otherwise the caption being typed.
+  const mouth: Mouth | undefined = speakingThis
+    ? mouthOf(voiceNow, "closed")
     : talking
       ? mouthFor(text[Math.min(text.length - 1, Math.floor(pos))])
-      : "smile";
-  const waving = line.wave && !reduce && tick < 22;
+      : undefined;
+  const level = speakingThis ? voiceNow.level : 0;
 
   return (
     <>
-      {waving ? (
-        <div className="relative shrink-0">
-          <div aria-hidden className="absolute left-1/2 top-[10%] aspect-square w-[130%] -translate-x-1/2 rounded-full bg-sun dark:top-[2%] dark:aspect-auto dark:h-full dark:w-[112%] dark:rounded-b-2xl dark:rounded-t-full" />
-          <Avatar pose={wavingPose(tick * 0.05)} t={tick * 0.05} height={narrow ? 150 : 210} />
+      <div className="relative shrink-0 overflow-hidden rounded-b-3xl" style={{ width: frameW, height: frameH }}>
+        <div aria-hidden className="absolute inset-x-[5%] bottom-0 top-[7%] rounded-t-full bg-sun" />
+        <div
+          className="absolute left-1/2 top-[5%] origin-[50%_45%] transition-transform duration-100 ease-out"
+          style={{
+            transform: `translateX(-50%) rotate(${reduce ? 0 : (level - 0.4) * 1.1}deg) translateY(${reduce ? 0 : level * 2.5}px)`,
+          }}
+        >
+          <Avatar pose={pose} mouth={mouth} height={figure} />
         </div>
-      ) : (
-        <div className="shrink-0 overflow-hidden rounded-full border-[4px] border-sun shadow-[0_8px_0_rgba(15,26,58,0.18)]">
-          <TalkingHead mouth={mouth} size={head} energy={speakingThis ? voiceNow.level : 0} />
-        </div>
-      )}
+      </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.92, x: -8 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ delay: 0.15, duration: 0.25 }}
         role="status"
-        className="pointer-events-auto relative mb-3 max-w-[min(calc(100vw-11.75rem),320px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
+        className="pointer-events-auto relative mb-24 max-w-[min(calc(100vw-11.25rem),320px)] md:mb-10 origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
       >
         <span className="sr-only">{text}</span>
         <span aria-hidden>
