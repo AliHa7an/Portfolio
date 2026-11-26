@@ -11,7 +11,7 @@ const facts = [
 ];
 
 export default function Hero() {
-  const { on, toggle } = useSound();
+  const { voice, toggleVoice } = useSound();
 
   return (
     <section id="top" className="relative z-[2] px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
@@ -51,23 +51,25 @@ export default function Hero() {
           <div className="hero-panel relative mx-auto h-[440px] max-w-md overflow-hidden rounded-[2rem] bg-sun sm:h-[520px] lg:h-full lg:min-h-[600px] lg:max-w-none">
             <div className="absolute left-5 top-5 z-10 max-w-[15rem] rounded-2xl rounded-bl-md bg-white px-4 py-3 text-on-sun shadow-[0_8px_0_rgba(15,26,58,0.12)] md:left-7 md:top-7">
               <p className="text-[0.95rem] font-medium leading-snug">
-                Hi, I&apos;m Ali. Turn on my voice and I&apos;ll talk you through my work.
+                {voice
+                  ? "Hi, I'm Ali. Click anywhere and I'll talk you through my work."
+                  : "Hi, I'm Ali. Turn my voice on and I'll talk you through my work."}
               </p>
               <button
                 type="button"
-                onClick={toggle}
-                aria-pressed={on}
+                onClick={toggleVoice}
+                aria-pressed={voice}
                 className="mt-2.5 inline-flex items-center gap-2 rounded-lg bg-on-sun px-3 py-2 text-sm font-semibold text-white"
               >
-                {on ? <VolumeX size={15} aria-hidden /> : <Volume2 size={15} aria-hidden />}
-                {on ? "Turn voice off" : "Turn voice on"}
+                {voice ? <VolumeX size={15} aria-hidden /> : <Volume2 size={15} aria-hidden />}
+                {voice ? "Mute my voice" : "Turn my voice on"}
               </button>
             </div>
             <Image
               src="/avatar/hero.webp"
-              alt="Illustrated portrait of Ali Hassan in a charcoal suit and navy tie"
-              width={371}
-              height={1150}
+              alt="Ali Hassan's avatar, standing in a charcoal suit and navy tie"
+              width={422}
+              height={1402}
               priority
               sizes="(min-width: 1024px) 420px, 320px"
               className="hero-figure absolute left-1/2 top-[19%] h-[165%] w-auto max-w-none -translate-x-1/2 select-none"

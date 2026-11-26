@@ -21,6 +21,7 @@ export default function StorySection() {
   const tourRef = useRef<number | null>(null);
   const sceneRef = useRef(0);
   const frameRef = useRef(-1);
+  const speakTimer = useRef<number | undefined>(undefined);
   const [mounted, setMounted] = useState(false);
   const [portrait, setPortrait] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -75,8 +76,10 @@ export default function StorySection() {
         sceneRef.current = idx;
         if (p > 0 && p < 1) {
           play("whoosh");
-          // He narrates while the tour plays itself; scrubbing by hand stays quiet.
-          if (touringRef.current) say(SCENES[idx].line);
+          // He reads each scene aloud. The short delay skips scenes that are
+          // only passing by during a fast scroll.
+          window.clearTimeout(speakTimer.current);
+          speakTimer.current = window.setTimeout(() => say(SCENES[idx].line), touringRef.current ? 0 : 350);
         }
       }
     };
@@ -97,6 +100,7 @@ export default function StorySection() {
     if (tourRef.current) cancelAnimationFrame(tourRef.current);
     tourRef.current = null;
     if (touringRef.current) hush();
+    window.clearTimeout(speakTimer.current);
     touringRef.current = false;
     setTouring(false);
   }, [hush]);

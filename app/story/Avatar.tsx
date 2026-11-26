@@ -1,9 +1,9 @@
 import React from "react";
 
 /**
- * Ali's illustrated avatar. Five aligned poses cut from his greeting
- * animation live in /public/avatar; this stacks them and shows one, so
- * switching pose never flashes while an image loads.
+ * Ali's avatar. Five poses, cut from his high-resolution pose sheet and
+ * aligned on the head, live in /public/avatar; this stacks them and shows
+ * one, so switching pose never flashes while an image loads.
  */
 export const POSES = {
   idle: 0,
@@ -16,7 +16,7 @@ export const POSES = {
 export type Pose = keyof typeof POSES;
 
 /** Width / height of every pose image. */
-export const AVATAR_RATIO = 486 / 1004;
+export const AVATAR_RATIO = 459 / 1200;
 
 export type AvatarProps = {
   pose: Pose;
@@ -37,7 +37,7 @@ export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
       style={{
         position: "relative",
         height,
-        aspectRatio: "486 / 1004",
+        aspectRatio: "459 / 1200",
         transform: sway ? `rotate(${sway}deg)` : undefined,
         transformOrigin: "50% 100%",
         ...style,
@@ -50,8 +50,8 @@ export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
           key={p}
           src={`/avatar/pose-${POSES[p]}.webp`}
           alt=""
-          width={486}
-          height={1004}
+          width={459}
+          height={1200}
           decoding="async"
           draggable={false}
           style={{

@@ -125,7 +125,7 @@ export const SHIPPED = [
 /** Lines the floating guide says as each page section scrolls into view. */
 export const GUIDE_LINES: Record<string, string> = {
   about: "This is how I work: end to end, from system design to the cloud it runs on.",
-  skills: "This is my toolkit. Press Listen on any row and I will tell you how I use it.",
+  skills: "This is my toolkit. Let me take you through it.",
   services: "You can hire me directly. Websites and stores are a fixed 120 dollars, and I quote AI agents and bots per project.",
   experience: "Six companies since 2018. Each entry shows what I owned and the stack I used.",
   projects: "Real products with real users. The ones with a live link open in a new tab.",
@@ -139,6 +139,59 @@ export function whatsappLink(message: string) {
 }
 
 /** Ask the on-page avatar to say something out loud. */
-export function askGuide(text: string) {
-  window.dispatchEvent(new CustomEvent("guide:say", { detail: { text } }));
+export function askGuide(text: string, row?: string) {
+  window.dispatchEvent(new CustomEvent("guide:say", { detail: { text, row } }));
 }
+
+/** What he says when a visitor first interacts with the page. */
+export const HERO_INTRO =
+  "Hi, I'm Ali Hassan. I build the product, the backend it runs on, and the AI inside it. Scroll down and I will talk you through my work.";
+
+/** Skills table rows, each with the line he speaks about it. */
+export const SKILL_GROUPS = [
+  {
+    label: "Frontend",
+    items: ["React", "Next.js", "React Native", "TypeScript", "Redux", "Tailwind CSS", "Material UI", "SSR and SSG"],
+    say: "On the front end I build with React and Next.js, and React Native for mobile apps, all in TypeScript.",
+  },
+  {
+    label: "Backend",
+    items: ["Node.js", "NestJS", "Express", "MERN stack", "Python", "FastAPI", "GraphQL", "REST", "Microservices", "Event-driven architecture"],
+    say: "On the back end I use Node, NestJS and the MERN stack, with Python and FastAPI where it fits.",
+  },
+  {
+    label: "AI agents and bots",
+    items: ["AI agents", "Agentic AI", "AI chatbots", "WhatsApp bots", "Vapi voice assistants", "Custom sales assistants", "OpenAI APIs", "Generative AI features", "Prompt engineering"],
+    say: "I build AI agents, chatbots, WhatsApp bots and voice assistants. One sales assistant I built lifted lead qualification by more than twenty five percent.",
+  },
+  {
+    label: "AI automation",
+    items: ["AI workflows", "Python automation", "Claude Code GitHub Actions", "Scheduled pipelines", "Webhooks", "Social API automation"],
+    say: "I set up AI workflows that run on a schedule and do the work themselves, with no manual steps.",
+  },
+  {
+    label: "AI-assisted development",
+    items: ["Claude Code", "Cursor", "OpenAI Codex", "Agentic coding", "Vibe coding", "AI code review"],
+    say: "I work with Claude Code, Cursor and Codex every day, and I still review and test everything before it ships.",
+  },
+  {
+    label: "Websites and stores",
+    items: ["Portfolio sites", "Business websites", "Shopify", "WooCommerce", "WordPress", "Strapi"],
+    say: "I build portfolio sites, business websites, and Shopify and WooCommerce stores.",
+  },
+  {
+    label: "Databases",
+    items: ["PostgreSQL", "MongoDB", "MySQL", "Supabase", "Redis", "Cosmos DB", "DynamoDB", "Prisma", "Sequelize", "Mongoose"],
+    say: "For data I use PostgreSQL, MongoDB, Supabase and Redis, and I tune schemas for heavy read traffic.",
+  },
+  {
+    label: "Cloud and DevOps",
+    items: ["AWS", "Azure", "Docker", "GitHub Actions", "Azure DevOps", "Vercel", "Cloudflare", "DigitalOcean"],
+    say: "I run things on AWS and Azure with Docker, and pipelines that deploy in under fifteen minutes.",
+  },
+  {
+    label: "Integrations",
+    items: ["Stripe", "PayPal", "Twilio", "Auth0", "Azure AD", "Apple and Google in-app purchases", "OAuth 2.0"],
+    say: "I connect payments with Stripe and PayPal, messaging with Twilio, and single sign-on with Auth0 and Azure AD.",
+  },
+];

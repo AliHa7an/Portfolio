@@ -11,6 +11,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { AVATAR_RATIO, Avatar, talkingPose, wavingPose, type Pose } from "./Avatar";
+import { TalkingHead, mouthFor } from "./TalkingHead";
 import {
   AI_PILLARS,
   JOURNEY,
@@ -710,10 +711,11 @@ function Narrator() {
           left: bubbleLeft,
           right: pick(72, 24),
           bottom: pick(40, 44),
-          minHeight: pick(96, 150),
+          minHeight: pick(116, 150),
           display: "flex",
           alignItems: "center",
-          padding: pick("18px 28px", "16px 20px"),
+          gap: pick(20, 14),
+          padding: pick("14px 28px 14px 14px", "14px 18px 14px 12px"),
           borderRadius: 26,
           borderBottomLeftRadius: 6,
           border: `2px solid ${C.fg}`,
@@ -726,6 +728,11 @@ function Narrator() {
           transform: `translateY(${(1 - bubbleIn) * 14}px)`,
         }}
       >
+        <TalkingHead
+          mouth={talking ? mouthFor(scene.line[Math.max(0, chars - 1)]) : "smile"}
+          size={pick(88, 84)}
+          style={{ border: `4px solid ${C.sun}` }}
+        />
         <span>
           {scene.line.slice(0, chars)}
           <span style={{ opacity: talking && frame % 16 < 8 ? 1 : 0 }}>▍</span>
