@@ -10,8 +10,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { AVATAR_RATIO, Avatar, talkingPose, wavingPose, type Pose } from "./Avatar";
-import { mouthFor, type Mouth } from "./TalkingHead";
 import {
   AI_PILLARS,
   JOURNEY,
@@ -57,10 +55,7 @@ const DARK: Palette = {
   onSun: "#0f1a3a",
 };
 
-/** His real voice, when it is playing: the mouth shape and loudness right now. */
-type Live = { mouth: Mouth; level: number } | null;
-
-const PaletteContext = React.createContext<{ C: Palette; dark: boolean; live: Live }>({ C: LIGHT, dark: false, live: null });
+const PaletteContext = React.createContext<{ C: Palette; dark: boolean }>({ C: LIGHT, dark: false });
 const usePalette = () => React.useContext(PaletteContext).C;
 
 const DISPLAY = "var(--font-display), system-ui, sans-serif";
@@ -141,11 +136,10 @@ function Intro({ scene }: { scene: Scene }) {
   const sub = usePop(34);
   const chips = ["Full Stack", "AI Agents", "Automation", "Voice AI"];
   return (
-    <SceneShell scene={scene} wide>
+    <SceneShell scene={scene}>
       <div
         style={{
-          marginLeft: pick(470, 0),
-          marginTop: pick(-30, 350),
+          marginTop: pick(-20, 60),
           textAlign: portrait ? "center" : "left",
         }}
       >
@@ -677,13 +671,14 @@ function TopBar() {
   );
 }
 
-/** The avatar and its speech bubble, visible across every scene. */
+/**
+ * His caption for the scene. Ali himself is a video laid over the stage by
+ * the page (see StorySection), in the space this leaves at the lower left.
+ */
 function Narrator() {
-  const { C, dark, live } = React.useContext(PaletteContext);
+  const C = usePalette();
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
-  const { pick, portrait } = useLayout();
-  const t = frame / fps;
+  const { pick } = useLayout();
 
   const scene = SCENES.find((s) => frame < s.from + s.duration) ?? SCENES[SCENES.length - 1];
   const local = frame - scene.from;
@@ -695,112 +690,38 @@ function Narrator() {
       ? 1
       : interpolate(local, [scene.duration - 10, scene.duration], [1, 0], clamp);
 
-  // Centre-stage for the intro, then steps back into the corner.
-  const settle = interpolate(frame, [118, 150], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
-  const bigH = pick(500, 330);
-  const smallH = pick(410, 270);
-  const h = interpolate(settle, [0, 1], [bigH, smallH]);
-  const w = h * AVATAR_RATIO;
-  const bigX = portrait ? (width - bigH * AVATAR_RATIO) / 2 : 150;
-  const bigY = pick(120, 96);
-  const smallX = pick(52, 20);
-  const smallY = height - smallH - pick(30, 20);
-  const x = interpolate(settle, [0, 1], [bigX, smallX]);
-  const y = interpolate(settle, [0, 1], [bigY, smallY]);
-  const enter = spring({ frame, fps, config: { damping: 14 } });
-
-  let pose: Pose = "idle";
-  if (scene.id === "intro") {
-    pose = frame < 12 ? "idle" : frame < 84 ? wavingPose(t) : frame < 118 ? "chest" : "idle";
-  } else if (scene.id === "cta" && local > 70) {
-    pose = wavingPose(t);
-  } else if (talking) {
-    pose = talkingPose(local / fps);
-  }
-
-  // Lips: the live voice when it is playing, otherwise the caption being typed.
-  const mouth: Mouth | undefined = live
-    ? live.mouth
-    : talking
-      ? mouthFor(scene.line[Math.max(0, chars - 1)])
-      : undefined;
-  if (live && pose === "idle") pose = talkingPose(t);
-
-  const bubbleLeft = pick(262, smallX + smallH * AVATAR_RATIO + 10);
-
   return (
-    <>
-      {/* He always stands in front of yellow: a disc by day, a full arch at night. */}
-      <div
-        style={
-          dark
-            ? {
-                position: "absolute",
-                left: x + w / 2 - w * 0.62,
-                top: y + h * 0.015,
-                width: w * 1.24,
-                height: h * 0.985,
-                borderRadius: `${w}px ${w}px ${h * 0.03}px ${h * 0.03}px`,
-                background: C.sun,
-                transform: `scaleY(${enter})`,
-                transformOrigin: "50% 100%",
-              }
-            : {
-                position: "absolute",
-                left: x + w / 2 - h * 0.36,
-                top: y + h * 0.1,
-                width: h * 0.72,
-                height: h * 0.72,
-                borderRadius: "50%",
-                background: C.sun,
-                transform: `scale(${enter})`,
-              }
-        }
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: x,
-          top: y,
-          opacity: enter,
-          transform: `translateY(${(1 - enter) * 40}px)`,
-        }}
-      >
-        <Avatar pose={pose} t={t} height={h} mouth={mouth} />
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          left: bubbleLeft,
-          right: pick(72, 24),
-          bottom: pick(40, 44),
-          minHeight: pick(104, 150),
-          display: "flex",
-          alignItems: "center",
-          padding: pick("18px 28px", "16px 20px"),
-          borderRadius: 26,
-          borderBottomLeftRadius: 6,
-          border: `2px solid ${C.fg}`,
-          background: C.surface,
-          color: C.fg,
-          fontSize: pick(27, 26),
-          fontWeight: 500,
-          lineHeight: 1.3,
-          opacity: bubbleIn * bubbleOut,
-          transform: `translateY(${(1 - bubbleIn) * 14}px)`,
-        }}
-      >
-        <span>
-          {scene.line.slice(0, chars)}
-          <span style={{ opacity: talking && frame % 16 < 8 ? 1 : 0 }}>▍</span>
-        </span>
-      </div>
-    </>
+    <div
+      style={{
+        position: "absolute",
+        left: pick(262, 190),
+        right: pick(72, 24),
+        bottom: pick(40, 44),
+        minHeight: pick(104, 150),
+        display: "flex",
+        alignItems: "center",
+        padding: pick("18px 28px", "16px 20px"),
+        borderRadius: 26,
+        borderBottomLeftRadius: 6,
+        border: `2px solid ${C.fg}`,
+        background: C.surface,
+        color: C.fg,
+        fontSize: pick(27, 26),
+        fontWeight: 500,
+        lineHeight: 1.3,
+        opacity: bubbleIn * bubbleOut,
+        transform: `translateY(${(1 - bubbleIn) * 14}px)`,
+      }}
+    >
+      <span>
+        {scene.line.slice(0, chars)}
+        <span style={{ opacity: talking && frame % 16 < 8 ? 1 : 0 }}>▍</span>
+      </span>
+    </div>
   );
 }
 
-export function PortfolioStory({ dark = false, live = null }: { dark?: boolean; live?: Live }) {
+export function PortfolioStory({ dark = false }: { dark?: boolean }) {
   const C = dark ? DARK : LIGHT;
   const scenes: Record<string, React.FC<{ scene: Scene }>> = {
     intro: Intro,
@@ -812,7 +733,7 @@ export function PortfolioStory({ dark = false, live = null }: { dark?: boolean; 
     cta: Cta,
   };
   return (
-    <PaletteContext.Provider value={{ C, dark, live }}>
+    <PaletteContext.Provider value={{ C, dark }}>
       <AbsoluteFill style={{ fontFamily: TEXT }}>
       <Backdrop />
       {SCENES.map((s) => {

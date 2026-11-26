@@ -7,7 +7,7 @@ import { PortfolioStory } from "../story/PortfolioStory";
 import { SCENES, STORY_DURATION, STORY_FPS } from "../story/content";
 import { useTheme } from "next-themes";
 import { useSound, useSpeech } from "./SoundProvider";
-import { mouthOf } from "../story/TalkingHead";
+import AvatarVideo from "./AvatarVideo";
 
 /** Scroll position 0 maps to this frame: the intro is already on screen. */
 const FIRST_FRAME = 50;
@@ -32,7 +32,7 @@ export default function StorySection() {
   const { play, say, hush } = useSound();
   const dark = useTheme().resolvedTheme === "dark";
   const voiceNow = useSpeech();
-  const live = voiceNow.active ? { mouth: mouthOf(voiceNow, "closed"), level: voiceNow.level } : null;
+  const narrating = voiceNow.active && SCENES.some((s) => s.line === voiceNow.text);
   const touringRef = useRef(false);
   const [near, setNear] = useState(false);
 
@@ -182,7 +182,7 @@ export default function StorySection() {
       key={`${portrait}-${reduced}`}
       ref={playerRef}
       component={PortfolioStory}
-      inputProps={{ dark, live }}
+      inputProps={{ dark }}
       durationInFrames={STORY_DURATION}
       fps={STORY_FPS}
       compositionWidth={size.w}
@@ -225,6 +225,18 @@ export default function StorySection() {
           }}
         >
           {stage}
+          {/* Ali, on video, standing at the lower left of the stage. */}
+          {mounted && near && (
+            <AvatarVideo
+              speaking={narrating}
+              zoom={1.35}
+              className={
+                portrait
+                  ? "absolute bottom-[4.2%] left-[2.8%] h-[19.5%] w-[21%] rounded-b-2xl rounded-t-full"
+                  : "absolute bottom-[5.5%] left-[3.4%] h-[52%] w-[15.6%] rounded-b-3xl rounded-t-full"
+              }
+            />
+          )}
         </div>
 
         {!reduced && (
