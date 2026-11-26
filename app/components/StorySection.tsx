@@ -167,7 +167,7 @@ export default function StorySection() {
         }
       >
         <div
-          className="relative w-full overflow-hidden rounded-3xl border border-line-strong bg-[#07070a] shadow-[0_40px_120px_-30px_rgba(255,122,69,0.35)]"
+          className="relative w-full overflow-hidden rounded-[2rem] border-[1.5px] border-line-strong bg-[#f3f4f6]"
           style={{
             aspectRatio: `${size.w} / ${size.h}`,
             maxWidth: portrait
@@ -180,19 +180,16 @@ export default function StorySection() {
 
         {!reduced && (
           <div className="mt-4 flex w-full max-w-[1180px] items-center justify-between gap-4 px-1">
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
-              {touring ? "Playing · scroll to take over" : done ? "End of the tour" : "Scroll to play"}
+            <p className="text-fg-soft">
+              {touring ? "Playing. Scroll to take over." : done ? "That is the end of the tour." : "Scroll to play the tour."}
             </p>
             <button
               type="button"
-              data-cursor="hover"
               onClick={() => (touring ? stopTour() : startTour(done))}
-              className="group inline-flex items-center gap-2 rounded-full bg-fg py-1.5 pl-4 pr-1.5 text-xs font-medium text-bg btn-shine"
+              className="btn btn-primary !py-2.5"
             >
-              {touring ? "Pause" : done ? "Replay" : "Play the tour"}
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-bg text-fg">
-                {touring ? <Pause size={13} /> : done ? <RotateCcw size={13} /> : <Play size={13} />}
-              </span>
+              {touring ? <Pause size={15} aria-hidden /> : done ? <RotateCcw size={15} aria-hidden /> : <Play size={15} fill="currentColor" aria-hidden />}
+              {touring ? "Pause" : done ? "Replay" : "Play it for me"}
             </button>
           </div>
         )}

@@ -125,8 +125,8 @@ export const SHIPPED = [
 /** Lines the floating guide says as each page section scrolls into view. */
 export const GUIDE_LINES: Record<string, string> = {
   about: "This is how I work: end to end, from system design to the cloud it runs on.",
-  skills: "My toolkit. The AI cards are where most of my recent work has been.",
-  experience: "Six companies since 2018. Each card shows what I owned and the stack I used.",
+  skills: "My toolkit. The three AI rows are where most of my recent work has been.",
+  experience: "Six companies since 2018. Each entry shows what I owned and the stack I used.",
   projects: "Real products with real users. The ones with a live link open in a new tab.",
-  contact: "That's me. If you have a role or a product in mind, send a message here.",
+  contact: "That's me. If you have a role or a product in mind, write to me here.",
 };

@@ -1,37 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import CursorFollower from "./components/CursorFollower";
-import SceneBackground from "./components/SceneBackground";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import BackToTop from "./components/BackToTop";
 import CommandPalette from "./components/CommandPalette";
-import ConsoleEgg from "./components/ConsoleEgg";
 import Guide from "./components/Guide";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+const title = "Ali Hassan, senior full stack and AI engineer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://alihexan.com"),
-  title: "Ali Hassan — Senior Full Stack & AI Engineer",
+  title,
   description:
-    "Ali Hassan — Senior Full Stack & AI Engineer with 7+ years building production web, mobile, and AI systems. Expert in React, Next.js, NestJS, TypeScript, AWS, and Vapi voice AI. Available for senior roles and product engagements.",
+    "Ali Hassan builds production web, mobile and AI systems: React, Next.js, NestJS, Python, AI agents and voice assistants. Seven years, six companies, clients on four continents.",
   keywords: [
     "Ali Hassan",
     "Full Stack Developer",
@@ -49,7 +30,6 @@ export const metadata: Metadata = {
     "Vapi",
     "Node.js",
     "AWS",
-    "Portfolio",
     "Remote Developer",
     "Pakistan Developer",
   ],
@@ -61,43 +41,29 @@ export const metadata: Metadata = {
     apple: "/icon.png",
   },
   openGraph: {
-    title: "Ali Hassan — Senior Full Stack & AI Engineer",
+    title,
     description:
-      "7+ years shipping production web, mobile, and AI systems for 6 companies across 4 continents. React · Next.js · NestJS · AWS · OpenAI · Vapi.",
+      "Production web, mobile and AI systems. React, Next.js, NestJS, Python, AI agents and voice assistants.",
     type: "website",
     images: [{ url: "/icon.png", width: 800, height: 800, alt: "Ali Hassan" }],
   },
   twitter: {
     card: "summary",
-    title: "Ali Hassan — Senior Full Stack & AI Engineer",
-    description:
-      "7+ years shipping production web, mobile, and AI systems. React · Next.js · NestJS · AWS · OpenAI.",
+    title,
+    description: "Production web, mobile and AI systems. React, Next.js, NestJS, Python, AI agents.",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <body className="min-h-full bg-bg text-fg font-sans">
         <Providers>
-          <SceneBackground />
-          <div className="noise" aria-hidden />
-          <CursorFollower />
           <Navbar />
-          <main className="relative z-10">{children}</main>
+          <main>{children}</main>
           <Footer />
           <Guide />
-          <BackToTop />
           <CommandPalette />
-          <ConsoleEgg />
         </Providers>
       </body>
     </html>

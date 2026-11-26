@@ -1,9 +1,4 @@
-"use client";
-
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
 import SectionHeader from "./SectionHeader";
-import { Reveal } from "./Reveal";
 
 type Job = {
   company: string;
@@ -91,135 +86,33 @@ const jobs: Job[] = [
 ];
 
 export default function Experience() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 80%", "end 30%"],
-  });
-  const lineH = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
   return (
     <section id="experience" className="section">
       <div className="container-x">
         <SectionHeader
-          index="03"
-          kicker="Experience"
-          title="Seven years, six teams, one throughline."
-          description="From Islamabad to fully distributed roles for clients across four continents — building, leading, and shipping production software."
+          title="Where I've worked"
+          description="Six companies since 2018, most recent first."
         />
-
-        <div ref={ref} className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-line-strong/60" />
-          <motion.div
-            style={{ height: lineH }}
-            className="absolute left-4 md:left-1/2 top-0 w-px bg-linear-to-b from-accent via-accent-2 to-accent-3"
-          />
-
-          <ul className="space-y-12 md:space-y-20">
-            {jobs.map((job, i) => {
-              const left = i % 2 === 0;
-              return (
-                <li key={job.company} className="relative">
-                  {/* Dot */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute left-4 md:left-1/2 top-2 -translate-x-1/2 z-10"
-                  >
-                    {i === 0 ? (
-                      <span className="relative flex h-4 w-4">
-                        <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-                        <span className="relative inline-flex h-4 w-4 rounded-full bg-bg border-2 border-emerald-500 shadow-[0_0_0_4px_color-mix(in_oklab,#22c55e_18%,transparent)]" />
-                      </span>
-                    ) : (
-                      <span className="block h-4 w-4 rounded-full bg-bg border-2 border-accent shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_18%,transparent)]" />
-                    )}
-                  </motion.div>
-
-                  <div
-                    className={`pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-12 ${
-                      left ? "" : "md:[&>*:first-child]:order-2"
-                    }`}
-                  >
-                    <div
-                      className={`hidden md:block ${
-                        left ? "md:text-right md:pr-12" : "md:pl-12"
-                      }`}
-                    >
-                      <div className="font-mono text-xs text-accent tracking-wider mb-2">
-                        {job.period}
-                      </div>
-                      <div className="text-sm text-muted">{job.location}</div>
-                    </div>
-                    <Reveal
-                      delay={0.05 * i}
-                      className={left ? "md:pl-12" : "md:pr-12 md:text-right"}
-                    >
-                      <div
-                        onMouseMove={(e) => {
-                          const r = (
-                            e.currentTarget as HTMLElement
-                          ).getBoundingClientRect();
-                          (e.currentTarget as HTMLElement).style.setProperty(
-                            "--mx",
-                            `${e.clientX - r.left}px`
-                          );
-                          (e.currentTarget as HTMLElement).style.setProperty(
-                            "--my",
-                            `${e.clientY - r.top}px`
-                          );
-                        }}
-                        className="card-spotlight rounded-2xl p-6 md:p-8 text-left"
-                      >
-                        <div className="md:hidden font-mono text-xs text-accent mb-2 tracking-wider">
-                          {job.period} · {job.location}
-                        </div>
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          <h3 className="font-display text-xl md:text-2xl font-semibold">
-                            {job.company}
-                          </h3>
-                          {i === 0 && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium tracking-wide text-emerald-500">
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              Current
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-1 text-sm text-fg-soft">
-                          {job.role}
-                        </div>
-                        <ul className="mt-5 space-y-3">
-                          {job.bullets.map((b, bi) => (
-                            <li
-                              key={bi}
-                              className="flex gap-3 text-sm text-fg-soft leading-relaxed"
-                            >
-                              <span className="mt-2 inline-block h-1 w-1 rounded-full bg-accent shrink-0" />
-                              <span>{b}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="mt-5 flex flex-wrap gap-1.5">
-                          {job.stack.map((s) => (
-                            <span
-                              key={s}
-                              className="inline-flex items-center rounded-full border border-line bg-bg-soft/60 px-2.5 py-1 text-[11px] text-fg-soft"
-                            >
-                              {s}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </Reveal>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <ol>
+          {jobs.map((j) => (
+            <li key={j.company + j.period} className="grid gap-x-8 gap-y-3 border-t border-line-strong py-8 md:grid-cols-12 md:py-10">
+              <div className="md:col-span-4">
+                <p className="font-medium">{j.period.replace(" — ", " to ")}</p>
+                <p className="text-fg-soft">{j.location}</p>
+              </div>
+              <div className="md:col-span-8">
+                <h3 className="display text-3xl md:text-4xl">{j.company}</h3>
+                <p className="mt-2 text-lg text-fg-soft">{j.role.replace(" · ", ", ").replace("Part-Time", "part-time")}</p>
+                <ul className="mt-5 max-w-[68ch] list-disc space-y-2 pl-5 marker:text-muted">
+                  {j.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-muted">{j.stack.join(", ")}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );

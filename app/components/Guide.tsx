@@ -67,48 +67,70 @@ export default function Guide() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 60 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-none fixed bottom-0 left-2 z-40 flex items-end gap-1 md:left-5"
+          className="pointer-events-none fixed bottom-0 left-3 z-40 flex items-end md:left-6"
         >
-          {hidden ? (
-            <button
-              type="button"
-              onClick={() => hiddenStore.set(false)}
-              data-cursor="hover"
-              aria-label="Show the guide"
-              className="pointer-events-auto mb-4 h-14 w-14 overflow-hidden rounded-full border border-line-strong bg-[radial-gradient(circle_at_50%_30%,#ffffff,#c9c3ff_55%,#8a73ff)] shadow-lg"
-            >
-              <span className="flex justify-center pt-1">
-                <Avatar pose="idle" height={190} />
-              </span>
-            </button>
-          ) : (
-            <GuideBody key={section} line={GUIDE_LINES[section]} onHide={() => hiddenStore.set(true)} />
-          )}
+          <GuideBody
+            key={section}
+            line={GUIDE_LINES[section]}
+            quiet={hidden}
+            onQuiet={hiddenStore.set}
+          />
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
 
-/** Remounted for every section, so the wave and the typing restart cleanly. */
-function GuideBody({ line, onHide }: { line: string; onHide: () => void }) {
+/**
+ * Remounted for every section. He steps in, says his line, then tucks away
+ * into a small button so he never sits on top of what you are reading.
+ */
+function GuideBody({
+  line,
+  quiet,
+  onQuiet,
+}: {
+  line: string;
+  quiet: boolean;
+  onQuiet: (v: boolean) => void;
+}) {
   const [reduce] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const [tick, setTick] = useState(0);
+  const end = 12 + line.length + 70;
+  const [tick, setTick] = useState(quiet ? end : 0);
   const chimed = useRef(false);
   const { play } = useSound();
+  const speaking = tick < end;
 
   useEffect(() => {
-    if (chimed.current) return;
+    if (chimed.current || quiet) return;
     chimed.current = true;
     play("chime");
-  }, [play]);
+  }, [play, quiet]);
 
   // One 20fps clock for the typewriter, the pose changes and the idle sway.
   useEffect(() => {
-    if (reduce) return;
-    const id = window.setInterval(() => setTick((n) => n + 1), 50);
+    if (!speaking) return;
+    const id = window.setInterval(() => setTick((n) => n + (reduce ? 4 : 1)), 50);
     return () => window.clearInterval(id);
-  }, [reduce]);
+  }, [speaking, reduce]);
+
+  if (!speaking) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onQuiet(false);
+          setTick(0);
+        }}
+        aria-label="Hear about this section"
+        className="pointer-events-auto mb-4 h-16 w-16 overflow-hidden rounded-full border-[1.5px] border-fg bg-sun"
+      >
+        <span className="flex justify-center pt-1.5">
+          <Avatar pose="idle" height={210} plain />
+        </span>
+      </button>
+    );
+  }
 
   const t = tick * 0.05;
   const typed = reduce ? line.length : Math.min(line.length, Math.max(0, tick - 12));
@@ -120,29 +142,28 @@ function GuideBody({ line, onHide }: { line: string; onHide: () => void }) {
   return (
     <>
       <div className="relative shrink-0">
-        <div
-          aria-hidden
-          className="absolute -inset-x-8 -top-4 bottom-0 rounded-full bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.28),rgba(138,115,255,0.22)_40%,transparent_70%)]"
-        />
-        <Avatar pose={pose} t={t} height="clamp(120px, 24vh, 220px)" />
+        <div aria-hidden className="absolute left-1/2 top-[12%] aspect-square w-[150%] -translate-x-1/2 rounded-full bg-sun" />
+        <Avatar pose={pose} t={reduce ? 0 : t} height="clamp(120px, 24vh, 220px)" />
       </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9, x: -10 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
-        transition={{ delay: 0.35, duration: 0.35 }}
+        transition={{ delay: 0.3, duration: 0.3 }}
         role="status"
-        className="pointer-events-auto relative mb-[clamp(72px,15vh,140px)] max-w-[min(62vw,300px)] origin-bottom-left rounded-2xl rounded-bl-sm border border-line-strong bg-surface/95 px-4 py-3 pr-9 text-sm leading-snug text-fg shadow-xl backdrop-blur-xl"
+        className="pointer-events-auto relative mb-[clamp(72px,15vh,140px)] ml-3 max-w-[min(62vw,300px)] origin-bottom-left rounded-2xl rounded-bl-md border-[1.5px] border-fg bg-surface px-4 py-3 pr-9 text-[0.95rem] font-medium leading-snug text-fg"
       >
         <span className="sr-only">{line}</span>
         <span aria-hidden>
           {line.slice(0, typed)}
-          {talking && <span className="text-accent">▍</span>}
+          {talking && <span>▍</span>}
         </span>
         <button
           type="button"
-          onClick={onHide}
-          data-cursor="hover"
-          aria-label="Hide the guide"
+          onClick={() => {
+            onQuiet(true);
+            setTick(end);
+          }}
+          aria-label="Stop the guide"
           className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full text-muted hover:text-fg"
         >
           <X size={13} />

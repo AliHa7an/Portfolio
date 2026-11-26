@@ -24,11 +24,13 @@ export type AvatarProps = {
   t?: number;
   /** Rendered height in px (or any CSS length). */
   height: number | string;
+  /** Skip the outline and shadow, for use on a bright solid field. */
+  plain?: boolean;
   style?: React.CSSProperties;
   className?: string;
 };
 
-export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
+export function Avatar({ pose, t = 0, height, plain, style, className }: AvatarProps) {
   const sway = Math.sin(t * 1.5) * 0.6;
   const breathe = 1 + Math.sin(t * 1.9) * 0.006;
   return (
@@ -59,8 +61,9 @@ export function Avatar({ pose, t = 0, height, style, className }: AvatarProps) {
             height: "100%",
             objectFit: "contain",
             opacity: p === pose ? 1 : 0,
-            filter:
-              "drop-shadow(0 0 1px rgba(255,255,255,0.55)) drop-shadow(0 18px 24px rgba(0,0,0,0.45))",
+            filter: plain
+              ? undefined
+              : "drop-shadow(0 0 1px rgba(255,255,255,0.7)) drop-shadow(0 10px 14px rgba(15,26,58,0.22))",
             userSelect: "none",
           }}
         />

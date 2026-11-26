@@ -1,75 +1,29 @@
-"use client";
-
-import { motion, useInView } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
 import SectionHeader from "./SectionHeader";
-import { Reveal } from "./Reveal";
-import {
-  Brain,
-  Cloud,
-  Code2,
-  Database,
-  GraduationCap,
-  Rocket,
-  ShieldCheck,
-} from "lucide-react";
-import DeveloperCard from "./DeveloperCard";
 
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    let start: number | null = null;
-    const dur = 1500;
-    const step = (t: number) => {
-      if (start === null) start = t;
-      const p = Math.min((t - start) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setN(Math.round(eased * to));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [inView, to]);
-  return (
-    <span ref={ref}>
-      {n}
-      {suffix}
-    </span>
-  );
-}
-
-const highlights = [
+const areas = [
   {
-    Icon: Code2,
-    title: "Full-Stack Engineering",
-    body: "React, Next.js, NestJS, Node, React Native — modular monorepos and clean architecture.",
+    title: "Full stack engineering",
+    body: "React, Next.js, NestJS, Node and React Native, in modular codebases other people can pick up.",
   },
   {
-    Icon: Brain,
-    title: "Production AI Systems",
-    body: "AI agents, Vapi voice assistants, OpenAI chatbots and automated AI workflows that move metrics.",
+    title: "AI in production",
+    body: "AI agents, Vapi voice assistants, OpenAI chatbots and automated workflows that move a metric.",
   },
   {
-    Icon: Cloud,
-    title: "Cloud Architecture",
-    body: "AWS & Azure microservices, infrastructure-as-code, CI/CD that ships in under 15 minutes.",
+    title: "Cloud architecture",
+    body: "Microservices on AWS and Azure, with CI/CD that ships a release in under 15 minutes.",
   },
   {
-    Icon: Database,
-    title: "Data & APIs",
-    body: "PostgreSQL, MongoDB, Redis, GraphQL & REST — schemas tuned for read-heavy workloads.",
+    title: "Data and APIs",
+    body: "PostgreSQL, MongoDB and Redis behind GraphQL and REST, with schemas tuned for read-heavy load.",
   },
   {
-    Icon: ShieldCheck,
-    title: "Enterprise Auth",
-    body: "Auth0 and Azure AD single sign-on, OAuth 2.0 / JWT, hardened against the OWASP top 10.",
+    title: "Enterprise sign-in",
+    body: "Auth0 and Azure AD single sign-on, OAuth 2.0 and JWT, hardened against the OWASP top 10.",
   },
   {
-    Icon: Rocket,
-    title: "Cross-Platform Mobile",
-    body: "React Native iOS & Android with in-app subscriptions, TestFlight & Play Console releases.",
+    title: "Mobile",
+    body: "React Native apps for iOS and Android with in-app subscriptions, released through TestFlight and Play Console.",
   },
 ];
 
@@ -78,132 +32,32 @@ export default function About() {
     <section id="about" className="section">
       <div className="container-x">
         <SectionHeader
-          index="01"
-          kicker="About"
-          title="Engineer at the seam of product, AI, and infrastructure."
-          description="I work end-to-end — designing systems, shipping the UI, owning the cloud they run on. I prefer real problems with real users over abstractions for their own sake."
+          title="I take a product from the first diagram to the cloud it runs on."
+          description="I design the system, build the interface and own the deployment. I lead distributed teams, and I care more about features customers use than features that demo well."
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <Reveal className="lg:col-span-5">
-            <div className="rounded-3xl border border-line-strong bg-surface/60 backdrop-blur-xl p-8 md:p-10 sticky top-28">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <div className="font-display text-5xl font-semibold text-accent">
-                    <Counter to={7} suffix="+" />
-                  </div>
-                  <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Years building
-                  </div>
-                </div>
-                <div>
-                  <div className="font-display text-5xl font-semibold text-accent-3">
-                    <Counter to={6} />
-                  </div>
-                  <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Companies
-                  </div>
-                </div>
-                <div>
-                  <div className="font-display text-5xl font-semibold text-accent-2">
-                    <Counter to={11} suffix="+" />
-                  </div>
-                  <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Projects shipped
-                  </div>
-                </div>
-                <div>
-                  <div className="font-display text-5xl font-semibold text-accent-3">
-                    <Counter to={4} />
-                  </div>
-                  <div className="mt-2 text-sm text-muted uppercase tracking-wider">
-                    Continents served
-                  </div>
-                </div>
+        <div className="grid gap-12 lg:grid-cols-12">
+          <dl className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:col-span-8">
+            {areas.map((a) => (
+              <div key={a.title} className="border-t-[3px] border-fg pt-4">
+                <dt className="font-display text-xl font-bold tracking-tight">{a.title}</dt>
+                <dd className="mt-2 text-fg-soft">{a.body}</dd>
               </div>
-
-              <div className="mt-8 pt-8 border-t border-line">
-                <p className="text-fg-soft leading-relaxed">
-                  I lead distributed teams, integrate Stripe and Twilio, and
-                  ship AI features that customers actually use — not just demo
-                  well.
-                </p>
-              </div>
-
-              {/* Education */}
-              <div className="mt-6 pt-6 border-t border-line flex items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-bg-soft border border-line">
-                  <GraduationCap size={15} className="text-accent-2" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">
-                    B.Sc. Computer Science
-                  </div>
-                  <div className="mt-0.5 text-xs text-muted">
-                    Quaid-i-Azam University · Islamabad, PK
-                  </div>
-                  <div className="mt-0.5 text-xs text-muted">2014 – 2018</div>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {highlights.map((h, i) => (
-              <motion.div
-                key={h.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{
-                  duration: 0.6,
-                  delay: i * 0.07,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                onMouseMove={(e) => {
-                  const r = (
-                    e.currentTarget as HTMLElement
-                  ).getBoundingClientRect();
-                  (e.currentTarget as HTMLElement).style.setProperty(
-                    "--mx",
-                    `${e.clientX - r.left}px`
-                  );
-                  (e.currentTarget as HTMLElement).style.setProperty(
-                    "--my",
-                    `${e.clientY - r.top}px`
-                  );
-                }}
-                className="card-spotlight rounded-2xl p-6 group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-bg-soft border border-line">
-                    <h.Icon
-                      size={18}
-                      className="text-accent group-hover:scale-110 transition-transform"
-                    />
-                  </div>
-                  <div className="font-mono text-xs text-muted">0{i + 1}</div>
-                </div>
-                <h3 className="mt-5 font-display text-lg font-semibold">
-                  {h.title}
-                </h3>
-                <p className="mt-2 text-sm text-fg-soft leading-relaxed">
-                  {h.body}
-                </p>
-              </motion.div>
             ))}
+          </dl>
 
-            {/* Developer code card — spans full width of the 2-col grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.7, delay: 0.42, ease: [0.16, 1, 0.3, 1] }}
-              className="sm:col-span-2"
-            >
-              <DeveloperCard />
-            </motion.div>
-          </div>
+          <aside className="lg:col-span-4">
+            <div className="rounded-3xl bg-surface p-7">
+              <p className="font-display text-2xl font-bold leading-tight tracking-tight">
+                Seven years, six companies, eleven shipped products, clients on four continents.
+              </p>
+              <dl className="mt-6 border-t border-line pt-5">
+                <dt className="text-sm text-muted">Education</dt>
+                <dd className="mt-1 font-medium">BS Computer Science</dd>
+                <dd className="text-fg-soft">Quaid-i-Azam University, Islamabad, 2016 to 2020</dd>
+              </dl>
+            </div>
+          </aside>
         </div>
       </div>
     </section>

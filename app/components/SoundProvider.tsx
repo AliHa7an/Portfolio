@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { VolumeX } from "lucide-react";
 
 type SoundName = "hover" | "click" | "chime" | "whoosh";
 
@@ -222,24 +222,18 @@ export function SoundToggle() {
       aria-pressed={on}
       aria-label={on ? "Turn sound off" : "Turn sound on"}
       title={on ? "Sound on" : "Sound off"}
-      data-cursor="hover"
-      className="relative flex h-10 items-center gap-2 rounded-full border border-line-strong bg-surface/60 backdrop-blur px-3 text-xs font-medium hover:border-accent transition-colors"
+      className="flex h-10 items-center gap-2 rounded-xl border-[1.5px] border-line-strong px-3 text-[0.95rem] font-medium hover:border-fg transition-colors"
     >
       {on ? (
         <span className="flex h-4 items-end gap-[3px]" aria-hidden>
           {[0, 1, 2, 3].map((i) => (
-            <span
-              key={i}
-              className="eq-bar w-[3px] rounded-full bg-accent"
-              style={{ animationDelay: `${i * 0.13}s` }}
-            />
+            <span key={i} className="eq-bar w-[3px] rounded-full bg-fg" style={{ animationDelay: `${i * 0.13}s` }} />
           ))}
         </span>
       ) : (
-        <VolumeX size={16} className="text-muted" aria-hidden />
+        <VolumeX size={17} aria-hidden />
       )}
-      <span className="hidden lg:inline">{on ? "Sound on" : "Sound"}</span>
-      {on && <Volume2 size={14} className="hidden lg:inline text-accent" aria-hidden />}
+      <span className="hidden md:inline">{on ? "Sound on" : "Sound off"}</span>
     </button>
   );
 }
